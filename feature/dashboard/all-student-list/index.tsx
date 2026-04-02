@@ -6,7 +6,11 @@ import { FiSearch } from 'react-icons/fi';
 import StudentListTable from './StudentListTable';
 import StudentInfoModal from '@/ui/modal/StudentInfoModal';
 
-const AllStudentList = () => {
+interface AllStudentListProps {
+    data: any[];
+}
+
+const AllStudentList = ({ data }: AllStudentListProps) => {
 
     const [isOpen, setIsOpen] = useState(false);
 
@@ -24,7 +28,7 @@ const AllStudentList = () => {
                     />
 
                     <button
-                        type="submit"
+                        type="button"
                         className="bg-[#1A5FA4] h-[40px] w-full md:max-w-[200px] rounded-md text-white"
                         onClick={() => setIsOpen(true)}
                     >
@@ -33,7 +37,7 @@ const AllStudentList = () => {
                 </div>
             </div>
 
-            <StudentListTable setIsOpen={setIsOpen} />
+            <StudentListTable setIsOpen={setIsOpen} data={data} />
             <StudentInfoModal isOpen={isOpen} setIsOpen={setIsOpen} />
         </div>
     );

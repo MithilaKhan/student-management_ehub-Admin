@@ -7,8 +7,9 @@ import { FiSearch } from 'react-icons/fi';
 import SubjectListModal from '@/ui/modal/SubjectListModal';
 // import { SubjectListType } from '@/type';
 
-const SubjectList = () => {
+const SubjectList = ({ initialData }: { initialData?: any[] }) => {
     const [isOpen, setIsOpen] = useState(false);
+    const [editingSubject, setEditingSubject] = useState<any>(null);
 
     return (
         <div>
@@ -25,17 +26,30 @@ const SubjectList = () => {
                         />
 
                         <button
-                            type="submit"
+                            type="button"
                             className="bg-[#1A5FA4] h-[40px]  w-full md:max-w-[200px] rounded-md text-white"
-                            onClick={() => setIsOpen(true)}
+                            onClick={() => {
+                                setEditingSubject(null);
+                                setIsOpen(true);
+                            }}
                         >
                             + Add Subject
                         </button>
                     </div>
                 </div>
-                <SubjectListTable isOpen={isOpen} setIsOpen={setIsOpen} />
+                <SubjectListTable 
+                    isOpen={isOpen} 
+                    setIsOpen={setIsOpen} 
+                    dataSource={initialData} 
+                    setEditingSubject={setEditingSubject} 
+                />
             </div>
-            <SubjectListModal isOpen={isOpen} setIsOpen={setIsOpen} />
+            <SubjectListModal 
+                isOpen={isOpen} 
+                setIsOpen={setIsOpen} 
+                editingSubject={editingSubject} 
+                setEditingSubject={setEditingSubject} 
+            />
         </div>
     );
 };

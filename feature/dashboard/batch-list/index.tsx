@@ -6,8 +6,9 @@ import { FiSearch } from 'react-icons/fi';
 import BatchListTable from './BatchListTable';
 import BatchListModal from '@/ui/modal/BatchListModal';
 
-const BatchList = () => {
+const BatchList = ({ initialData }: { initialData?: any[] }) => {
     const [isOpen, setIsOpen] = useState(false);
+    const [editingBatch, setEditingBatch] = useState<any>(null);
 
     return (
         <div>
@@ -24,17 +25,31 @@ const BatchList = () => {
                         />
 
                         <button
-                            type="submit"
+                            type="button"
                             className="bg-[#1A5FA4] h-[40px] w-full md:max-w-[200px] rounded-md text-white"
-                            onClick={() => setIsOpen(true)}
+                            onClick={() => {
+                                setEditingBatch(null);
+                                setIsOpen(true);
+                            }}
                         >
                             + Add Batch
                         </button>
                     </div>
                 </div>
-                <BatchListTable isOpen={isOpen} setIsOpen={setIsOpen} />
+                <BatchListTable 
+                    isOpen={isOpen} 
+                    setIsOpen={setIsOpen} 
+                    dataSource={initialData} 
+                    setEditingBatch={setEditingBatch} 
+                />
             </div>
-            <BatchListModal isOpen={isOpen} setIsOpen={setIsOpen} />
+            
+            <BatchListModal 
+                isOpen={isOpen} 
+                setIsOpen={setIsOpen} 
+                editingBatch={editingBatch} 
+                setEditingBatch={setEditingBatch} 
+            />
         </div>
     );
 };

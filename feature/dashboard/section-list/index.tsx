@@ -6,8 +6,13 @@ import { FiSearch } from 'react-icons/fi';
 import SectionListTable from './SectionListTable';
 import SectionListModal from '@/ui/modal/SectionListModal';
 
-const SectionList = () => {
+interface SectionListProps {
+    data: any[];
+}
+
+const SectionList = ({ data }: SectionListProps) => {
     const [isOpen, setIsOpen] = useState(false);
+    const [selectedSection, setSelectedSection] = useState<any>(null);
 
     return (
         <div>
@@ -26,16 +31,28 @@ const SectionList = () => {
                         <button
                             type="submit"
                             className="bg-[#1A5FA4] h-[40px] w-full md:max-w-[200px] rounded-md text-white"
-                            onClick={() => setIsOpen(true)}
+                            onClick={() => {
+                                setIsOpen(true);
+                                setSelectedSection(null);
+                            }}
                         >
                             + Add Section
                         </button>
                     </div>
                 </div>
 
-                <SectionListTable isOpen={isOpen} setIsOpen={setIsOpen} />
+                <SectionListTable 
+                  isOpen={isOpen} 
+                  setIsOpen={setIsOpen} 
+                  data={data} 
+                  setSelectedSection={setSelectedSection} 
+                />
             </div>
-            <SectionListModal isOpen={isOpen} setIsOpen={setIsOpen} />
+            <SectionListModal 
+              isOpen={isOpen} 
+              setIsOpen={setIsOpen} 
+              selectedSection={selectedSection} 
+            />
         </div>
     );
 };

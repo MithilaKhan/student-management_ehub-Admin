@@ -16,8 +16,14 @@ const Sidebar = ({ onCloseDrawer }: SidebarProps) => {
   const [selectedKey, setSelectedKey] = useState<string>(path);
   const [openKeys, setOpenKeys] = useState<string[]>([]);
   const items = menuItems ?? [];
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
     setSelectedKey(path);
     const parent = items.find(
       (it) =>
@@ -36,7 +42,7 @@ const Sidebar = ({ onCloseDrawer }: SidebarProps) => {
         setOpenKeys([]);
       }
     }
-  }, [path, items]);
+  }, [path, items, mounted]);
 
   const handleOpenChange: MenuProps["onOpenChange"] = (keys) => {
     setOpenKeys(keys as string[]);
@@ -71,22 +77,34 @@ const Sidebar = ({ onCloseDrawer }: SidebarProps) => {
               token: { colorText: '#ABABAB' }
             }}
           >
-            <Menu
-              mode="inline"
-              selectedKeys={[selectedKey]}
-              openKeys={openKeys}
-              onOpenChange={handleOpenChange}
-              onClick={handleClick}
-              style={{ borderRightColor: 'transparent', background: 'transparent' }}
-              items={items}
-            />
+            {mounted && (
+                <Menu
+                mode="inline"
+                selectedKeys={[selectedKey]}
+                openKeys={openKeys}
+                onOpenChange={handleOpenChange}
+                onClick={handleClick}
+                style={{ borderRightColor: 'transparent', background: 'transparent' }}
+                items={items}
+                />
+            )}
           </ConfigProvider>
         </div>
 
         <div className="py-3 ps-3 absolute bottom-0 w-full bg-[#1C1C1E]">
           <Link
             href="/login"
-            onClick={onCloseDrawer}
+            onClick={() => {
+              // Clear localStorage and sessionStorage
+              localStorage.clear();
+              sessionStorage.clear();
+              
+              // Clear cookies
+              document.cookie = "accessToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax";
+              document.cookie = "refreshToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax";
+              
+              onCloseDrawer?.();
+            }}
             className="flex items-center gap-x-2 text-red-500 hover:text-red-600"
           >
             <IoIosLogOut size={18} />

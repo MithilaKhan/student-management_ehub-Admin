@@ -6,8 +6,13 @@ import { FiSearch } from 'react-icons/fi';
 import OverviewTable from './OverviewTable';
 import OverviewModal from '@/ui/modal/OverviewModal';
 
-const Overview = () => {
+interface OverviewProps {
+    data: any[];
+}
+
+const Overview = ({ data }: OverviewProps) => {
     const [isOpen, setIsOpen] = useState(false);
+    const [selectedRoutine, setSelectedRoutine] = useState<any>(null);
 
     return (
         <div>
@@ -24,17 +29,28 @@ const Overview = () => {
                         />
 
                         <button
-                            type="submit"
+                            type="button"
                             className="bg-[#1A5FA4] h-[40px] w-full md:max-w-[200px] rounded-md text-white"
-                            onClick={() => setIsOpen(true)}
+                            onClick={() => {
+                                setSelectedRoutine(null);
+                                setIsOpen(true);
+                            }}
                         >
                             + Add Routine
                         </button>
                     </div>
                 </div>
-                <OverviewTable isOpen={isOpen} setIsOpen={setIsOpen} />
+                <OverviewTable 
+                    data={data} 
+                    setIsOpen={setIsOpen} 
+                    setSelectedRoutine={setSelectedRoutine} 
+                />
             </div>
-            <OverviewModal isOpen={isOpen} setIsOpen={setIsOpen} />
+            <OverviewModal 
+                isOpen={isOpen} 
+                setIsOpen={setIsOpen} 
+                selectedRoutine={selectedRoutine} 
+            />
         </div>
     );
 };

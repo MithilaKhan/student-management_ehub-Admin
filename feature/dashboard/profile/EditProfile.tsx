@@ -1,12 +1,26 @@
 "use client"
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button, Form, Input } from 'antd';
 import { AiOutlineEdit } from 'react-icons/ai';
+import { useUser } from '@/app/providers/UserProvider';
 
 const EditProfile: React.FC = () => {
+    const user = useUser();
     const [profileForm] = Form.useForm();
     const [imgURL, setImgURL] = useState("https://i.pinimg.com/736x/7b/05/51/7b0551406cd7936252123558aacc9191.jpg");
     const [imgFile, setImageFile] = useState<File | null>(null);
+
+    useEffect(() => {
+        if (user) {
+            profileForm.setFieldsValue({
+                name: user.name,
+                email: user.email,
+            });
+            if (user.profile) {
+                setImgURL(user.profile);
+            }
+        }
+    }, [user, profileForm]);
 
     const onChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];

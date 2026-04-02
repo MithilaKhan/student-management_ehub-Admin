@@ -2,27 +2,42 @@ import Header from '@/shared/Header';
 import Sidebar from '@/shared/Sidebar';
 import { ConfigProvider } from 'antd';
 import HeaderDrawerWrapper from '@/ui/HeaderDrawerWrapper';
+import { fetchServer } from '@/lib/fetchServer';
+import { UserProvider } from '@/app/providers/UserProvider';
 
-const layout = ({ children }: { children: React.ReactNode }) => {
+const layout = async ({ children }: { children: React.ReactNode }) => {
+    
+    // Server-Side Data Fetching for User Profile with automated token injection
+    let userProfile = null;
+    try {
+        const response = await fetchServer('/user/profile');
+        if (response?.success) {
+            userProfile = response.data;
+        }
+    } catch (error) {
+        console.error("Failed to fetch user profile in layout:", error);
+        // the fetchUrl automatically handles 401s by redirecting to login.
+    }
 
     return (
-        <div className="grid grid-cols-12 text-[#ABABAB] bg-black">
+        <UserProvider user={userProfile}>
+            <div className="grid grid-cols-12 text-[#ABABAB] bg-black">
 
-            {/* Desktop Sidebar */}
-            <div className="hidden md:block col-span-2 h-screen bg-[#1C1C1E] overflow-x-hidden">
-                <Sidebar  />
-            </div>
-
-            {/* Main container */}
-            <div className="col-span-12 md:col-span-10 p-4 h-[100vh]">
-                <div className="h-[78px] flex items-center justify-between md:justify-end md:pr-5 pr-2 bg-[#1C1C1E] rounded-md ps-2"> 
-                    <HeaderDrawerWrapper />
-                    <Header />
+                {/* Desktop Sidebar */}
+                <div className="hidden md:block col-span-2 h-screen bg-[#1C1C1E] overflow-x-hidden">
+                    <Sidebar  />
                 </div>
 
-                {/* Content */}
-                <div className="pt-4 h-[calc(100vh-95px)]">
-                    <div className="h-full overflow-y-auto rounded-md bg-[#1C1C1E] md:p-5 p-2">
+                {/* Main container */}
+                <div className="col-span-12 md:col-span-10 p-4 h-[100vh]">
+                    <div className="h-[78px] flex items-center justify-between md:justify-end md:pr-5 pr-2 bg-[#1C1C1E] rounded-md ps-2"> 
+                        <HeaderDrawerWrapper />
+                        <Header />
+                    </div>
+
+                    {/* Content */}
+                    <div className="pt-4 h-[calc(100vh-95px)]">
+                        <div className="h-full overflow-y-auto rounded-md bg-[#1C1C1E] md:p-5 p-2">
                         <ConfigProvider
                             theme={{
                                 components: {
@@ -50,6 +65,7 @@ const layout = ({ children }: { children: React.ReactNode }) => {
                 </div>
             </div>
         </div>
+        </UserProvider>
     );
 };
 
