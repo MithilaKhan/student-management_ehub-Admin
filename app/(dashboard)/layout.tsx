@@ -5,6 +5,8 @@ import HeaderDrawerWrapper from '@/ui/HeaderDrawerWrapper';
 import { fetchServer } from '@/lib/fetchServer';
 import { UserProvider } from '@/app/providers/UserProvider';
 
+export const dynamic = 'force-dynamic';
+
 const layout = async ({ children }: { children: React.ReactNode }) => {
     
     // Server-Side Data Fetching for User Profile with automated token injection

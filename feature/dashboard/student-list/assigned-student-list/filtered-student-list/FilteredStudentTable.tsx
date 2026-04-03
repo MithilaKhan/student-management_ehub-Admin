@@ -1,22 +1,78 @@
-
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { modalType } from '@/type';
 import TableMain from '@/shared/TableMain';
 import { AiOutlineDelete, AiOutlineEdit } from 'react-icons/ai';
-import { assignedStudentData } from '@/constants/dashboard/student-list-data';
-const FilteredStudentTable = ({ setIsOpen }: modalType) => {
+import { useSearchParams } from 'next/navigation';
+import { fetchUrl } from '@/lib/fetchUrl';
+import { Modal } from 'antd';
+import { toast } from 'react-hot-toast';
+
+const FilteredStudentTable = ({ 
+  setIsOpen, 
+  refreshTrigger, 
+  onEdit, 
+  onRefresh 
+}: modalType & { 
+  refreshTrigger?: number; 
+  onEdit?: (student: any) => void;
+  onRefresh?: () => void;
+}) => {
+  const searchParams = useSearchParams();
+  const [students, setStudents] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchStudents = async () => {
+      setLoading(true);
+      try {
+        const query = searchParams.toString();
+        const res = await fetchUrl(`/assigned/filter?${query}`);
+        if (res?.success) {
+          setStudents(res.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch filtered students:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStudents();
+  }, [searchParams, refreshTrigger]);
+
+  const handleDelete = (id: string) => {
+    Modal.confirm({
+        title: 'Are you sure you want to delete this student?',
+        content: 'This action cannot be undone.',
+        okText: 'Yes, Delete',
+        okType: 'danger',
+        cancelText: 'No',
+        async onOk() {
+            try {
+                const res = await fetchUrl(`/assigned/${id}`, { method: 'DELETE' });
+                if (res.success) {
+                    toast.success(res.message || 'Student deleted successfully');
+                    if (onRefresh) onRefresh();
+                } else {
+                    toast.error(res.message || 'Failed to delete student');
+                }
+            } catch (error) {
+                toast.error('An error occurred during deletion');
+            }
+        }
+    });
+  };
 
 const columns = [
     {
       title: 'SL',
-      dataIndex: 'id',
-      key: 'id',
-      render: (val: number) => val ?? '-',
+      key: 'sl',
+      render: (_: any, __: any, index: number) => index + 1,
     },
     {
       title: 'Student Name',
-      dataIndex: 'studentName',
-      key: 'studentName',
+      dataIndex: 'name',
+      key: 'name',
     },
     {
       title: 'Email Address',
@@ -25,28 +81,29 @@ const columns = [
     },
     {
       title: 'Mobile No.',
-      dataIndex: 'mobile',
-      key: 'mobile',
+      dataIndex: 'phoneNumber',
+      key: 'phoneNumber',
     },
     {
       title: 'Passport No.',
-      dataIndex: 'passportNo',
-      key: 'passportNo',
+      dataIndex: 'passportNumber',
+      key: 'passportNumber',
+      render: (val: string) => (val && val.trim() ? val : '-----'),
     },
     {
       title: 'Batch',
-      dataIndex: 'batch',
       key: 'batch',
+      render: (record: any) => record.batchName?.name || '-',
     },
     {
       title: 'Subject',
-      dataIndex: 'subject',
       key: 'subject',
+      render: (record: any) => record.subjectName?.name || '-',
     },
     {
       title: 'Section',
-      dataIndex: 'section',
       key: 'section',
+      render: (record: any) => record.sectionName?.name || '-',
     },
     {
       title: 'Special Fee',
@@ -55,16 +112,14 @@ const columns = [
       render: (val: string) => (val && val.trim() ? val : '-----'),
     },
     {
-      title: 'Delete date',
-      dataIndex: 'deleteDate',
-      key: 'deleteDate',
-      render: (val: string) => (val && val.trim() ? val : '-----'),
-    },
-    {
-      title: 'Profile Edit',
-      dataIndex: 'profileEdit',
-      key: 'profileEdit',
-      render: (val: string) => <span className="text-green-400 cursor-pointer">{val}</span>,
+        title: 'Status',
+        dataIndex: 'status',
+        key: 'status',
+        render: (val: string) => (
+            <span className={val === 'Waiting' ? 'text-yellow-500' : 'text-green-500'}>
+                {val || '-'}
+            </span>
+        )
     },
     {
       title: 'Download Form',
@@ -77,10 +132,10 @@ const columns = [
       key: 'action',
       render: (_: any, record: any) => (
         <div className="flex items-center gap-3">
-          <button onClick={() => setIsOpen(true)} className="text-[#FBBF24]">
+          <button onClick={() => onEdit && onEdit(record)} className="text-[#FBBF24]">
             <AiOutlineEdit size={16} />
           </button>
-          <button className="text-[#FF4D4D]">
+          <button onClick={() => handleDelete(record._id)} className="text-[#FF4D4D]">
             <AiOutlineDelete size={16} />
           </button>
         </div>
@@ -91,11 +146,13 @@ const columns = [
   return (
     <div>
       <TableMain
+        loading={loading}
         columns={columns}
-        dataSource={assignedStudentData} 
+        dataSource={students} 
+        rowKey="_id"
          pagination={{
           pageSize: 7,
-          total: assignedStudentData.length,
+          total: students.length,
           showSizeChanger: false,
           showQuickJumper: false,
         }}

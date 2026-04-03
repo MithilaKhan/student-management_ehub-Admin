@@ -39,7 +39,7 @@ const FilteredStudentList = () => {
                         </div>
                     </div>
                 </div>
-                <StudentReportTable />
+                <StudentReportTable  />
             </div>
         </div>
     );

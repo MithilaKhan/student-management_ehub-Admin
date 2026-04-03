@@ -1,4 +1,4 @@
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://192.168.0.100:3200/api/v1';
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://10.10.7.47:3200/api/v1';
 
 export type FetchOptions = RequestInit & {
   params?: Record<string, string>;

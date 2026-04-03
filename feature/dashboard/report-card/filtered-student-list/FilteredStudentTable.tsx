@@ -184,7 +184,7 @@ const StudentReportTable = () => {
       <TableMain
         columns={columns}
         dataSource={dataSource}
-        rowKey="id"
+        rowKey="key"
         pagination={{ pageSize: 7 }}
         className="w-full custom-table"
       />

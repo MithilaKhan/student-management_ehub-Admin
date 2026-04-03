@@ -8,6 +8,20 @@ import StudentCoursesModal from '@/ui/modal/StudentCoursesModal';
 
 const FilteredStudentList = () => {
     const [isOpen, setIsOpen] = useState(false);
+    const [refreshTrigger, setRefreshTrigger] = useState(0);
+    const [selectedStudent, setSelectedStudent] = useState<any>(null);
+
+    const onRefresh = () => setRefreshTrigger(prev => prev + 1);
+
+    const handleEdit = (student: any) => {
+        setSelectedStudent(student);
+        setIsOpen(true);
+    };
+
+    const handleCloseModal = () => {
+        setIsOpen(false);
+        setSelectedStudent(null);
+    };
 
     return (
         <div>
@@ -32,9 +46,20 @@ const FilteredStudentList = () => {
                         </button>
                     </div>
                 </div>
-                <FilteredStudentTable isOpen={isOpen} setIsOpen={setIsOpen} />
+                <FilteredStudentTable 
+                    isOpen={isOpen} 
+                    setIsOpen={setIsOpen} 
+                    refreshTrigger={refreshTrigger} 
+                    onEdit={handleEdit}
+                    onRefresh={onRefresh}
+                />
             </div>
-            <StudentCoursesModal isOpen={isOpen} setIsOpen={setIsOpen} />
+            <StudentCoursesModal 
+                isOpen={isOpen} 
+                setIsOpen={handleCloseModal} 
+                onSuccess={onRefresh} 
+                initialData={selectedStudent} 
+            />
         </div>
     );
 };

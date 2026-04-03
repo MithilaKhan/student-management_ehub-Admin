@@ -1,10 +1,46 @@
 "use client";
 import React from 'react';
 import { DatePicker, Form, Input } from 'antd';
+import { fetchUrl } from '@/lib/fetchUrl';
+import { toast } from 'react-hot-toast';
 
 const StudentRegistrationForm = () => {
+    const [form] = Form.useForm();
+    const [loading, setLoading] = React.useState(false);
+
+    const onFinish = async (values: any) => {
+        setLoading(true);
+        try {
+            const payload = {
+                ...values,
+                name: `${values.fullName} ${values.lastName}`,
+                role: 'STUDENT',
+                dateOfBirth: values.dateOfBirth ? values.dateOfBirth.format('YYYY-MM-DD') : undefined,
+            };
+            
+            // Remove confirmPassword from payload
+            delete payload.confirmPassword;
+
+            const res = await fetchUrl('/user/staff', {
+                method: 'POST',
+                body: JSON.stringify(payload),
+            });
+
+            if (res.success) {
+                toast.success(res.message || 'Student registered successfully');
+                form.resetFields();
+            } else {
+                toast.error(res.message || 'Failed to register student');
+            }
+        } catch (error: any) {
+            toast.error(error.message || 'An error occurred during registration');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
-         <Form layout="vertical" className="w-full" >
+         <Form form={form} layout="vertical" className="w-full" onFinish={onFinish}>
       <div className="grid md:grid-cols-3 grid-cols-1 gap-4">
         <Form.Item
           label={<label className="block text-sm text-[#9CA3AF]">Full Name</label>}
@@ -118,15 +154,16 @@ const StudentRegistrationForm = () => {
           label={<label className="block text-sm text-[#9CA3AF]">Password</label>}
           name="password"
           rules={[{ required: true, message: 'Please enter Password' }]}
+          extra={<div className="text-xs text-[#FBBF24] mt-1">*min 8 character required</div>}
         >
           <Input.Password placeholder="Enter Password" style={{ height: 45 }} />
-          <div className="text-xs text-[#FBBF24] mt-1">*min 8 character required</div>
         </Form.Item>
 
         <Form.Item
           label={<label className="block text-sm text-[#9CA3AF]">Confirm Password</label>}
           name="confirmPassword"
           dependencies={['password']}
+          extra={<div className="text-xs text-[#FBBF24] mt-1">*min 8 character required</div>}
           rules={[
             { required: true, message: 'Please confirm Password' },
             ({ getFieldValue }) => ({
@@ -140,13 +177,16 @@ const StudentRegistrationForm = () => {
           ]}
         >
           <Input.Password placeholder="Enter Confirm Password" style={{ height: 45 }} />
-          <div className="text-xs text-[#FBBF24] mt-1">*min 8 character required</div>
         </Form.Item>
       </div>
 
       <Form.Item className="mt-6 flex justify-end">
-        <button type="submit" className="bg-[#1A5FA4] h-[45px] px-8 rounded-md text-white">
-          Submit
+        <button 
+            type="submit" 
+            disabled={loading}
+            className="bg-[#1A5FA4] h-[45px] px-8 rounded-md text-white disabled:opacity-50"
+        >
+          {loading ? 'Submitting...' : 'Submit'}
         </button>
       </Form.Item>
     </Form>

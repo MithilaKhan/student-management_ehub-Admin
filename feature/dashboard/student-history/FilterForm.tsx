@@ -2,22 +2,38 @@
 import React from 'react';
 import { Form, Select } from 'antd';
 import { MdArrowDropDown } from 'react-icons/md';
-import { studentOptions } from '@/constants/dashboard/class-routine-data';
+import { fetchUrl } from '@/lib/fetchUrl';
 
-const FilterForm = () => {
+const FilterForm = ({ onFinish }: { onFinish: (id: string) => void }) => {
     const [form] = Form.useForm();
+    const [students, setStudents] = React.useState<any[]>([]);
+
+    React.useEffect(() => {
+        const loadStudents = async () => {
+            const res = await fetchUrl('/assigned');
+            if (res.success) {
+                setStudents(res.data);
+            }
+        };
+        loadStudents();
+    }, []);
+
     const handleReset = () => {
         form.resetFields();
     };
+
+    const handleSubmit = (values: any) => {
+        onFinish(values.studentId);
+    };
     return (
-        <Form layout="vertical" className=' md:w-[55%] w-full'>
+        <Form form={form} layout="vertical" className=' md:w-[55%] w-full' onFinish={handleSubmit}>
             <Form.Item
                 label={<label className="block   text-[#9CA3AF]">Student Name</label>}
-                name="studentName"
-                rules={[{ required: true, message: "Please enter Student Name" }]}
+                name="studentId"
+                rules={[{ required: true, message: "Please select Student Name" }]}
             >
                 <Select
-                    options={studentOptions}
+                    options={students.map(s => ({ label: s.name, value: s._id }))}
                     placeholder="Select Student Name"
                     showSearch
                     optionFilterProp="label"

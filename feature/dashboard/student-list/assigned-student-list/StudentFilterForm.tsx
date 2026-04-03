@@ -1,14 +1,43 @@
 "use client";
 import React from 'react';
 import { Form, Select } from 'antd';
-import { studentOptions } from '@/constants/dashboard/class-routine-data';
 import { MdArrowDropDown } from 'react-icons/md';
 import { useRouter } from 'next/navigation';
+import { Level } from '@/type';
+import { fetchUrl } from '@/lib/fetchUrl';
 
 const StudentFilterForm = () => {  
     const router = useRouter();
+    const [subjects, setSubjects] = React.useState<any[]>([]);
+    const [batches, setBatches] = React.useState<any[]>([]);
+    const [sections, setSections] = React.useState<any[]>([]);
+
+    React.useEffect(() => {
+        const loadOptions = async () => {
+            try {
+                const [subRes, batRes, secRes] = await Promise.all([
+                    fetchUrl('/subject'),
+                    fetchUrl('/batch'),
+                    fetchUrl('/section')
+                ]);
+                if (subRes?.success) setSubjects(subRes.data);
+                if (batRes?.success) setBatches(batRes.data);
+                if (secRes?.success) setSections(secRes.data);
+            } catch (err) {
+                console.error("Filter options fetch error:", err);
+            }
+        };
+        loadOptions();
+    }, []);
+
     const onFinish = (values: any) => {
-        router.push('/student-list/assigned-student-list/filtered-student-list');
+        const params = new URLSearchParams({
+            gradeName: values.gradeName || '',
+            subjectName: values.subjectName || '',
+            batchName: values.batchName || '',
+            sectionName: values.sectionName || '',
+        });
+        router.push(`/student-list/assigned-student-list/filtered-student-list?${params.toString()}`);
     }
     return (
         <Form layout="vertical" className=' md:w-[50%] w-[100%]' onFinish={onFinish}>
@@ -18,7 +47,7 @@ const StudentFilterForm = () => {
                 rules={[{ required: true, message: "Please enter Grade Name" }]}
             >
                 <Select
-                    options={studentOptions}
+                    options={Object.values(Level).map(level => ({ label: level, value: level }))}
                     placeholder="Select Grade"
                     showSearch
                     optionFilterProp="label"
@@ -32,7 +61,7 @@ const StudentFilterForm = () => {
                 rules={[{ required: true, message: "Please enter Subject Name" }]}
             >
                 <Select
-                    options={studentOptions}
+                    options={subjects.map(item => ({ label: item.name, value: item._id }))}
                     placeholder="Select Subject"
                     showSearch
                     optionFilterProp="label"
@@ -46,7 +75,7 @@ const StudentFilterForm = () => {
                 rules={[{ required: true, message: "Please enter Batch Name" }]}
             >
                 <Select
-                    options={studentOptions}
+                    options={batches.map(item => ({ label: item.name, value: item._id }))}
                     placeholder="Select Batch"
                     showSearch
                     optionFilterProp="label"
@@ -60,7 +89,7 @@ const StudentFilterForm = () => {
                 rules={[{ required: true, message: "Please enter Section Name" }]}
             >
                 <Select
-                    options={studentOptions}
+                    options={sections.map(item => ({ label: item.name, value: item._id }))}
                     placeholder="Select Section"
                     showSearch
                     optionFilterProp="label"

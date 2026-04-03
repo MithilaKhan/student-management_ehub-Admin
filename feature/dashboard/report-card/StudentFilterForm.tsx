@@ -5,28 +5,44 @@ import { studentOptions } from '@/constants/dashboard/class-routine-data';
 import { MdArrowDropDown } from 'react-icons/md';
 import { useRouter } from 'next/navigation';
 import { IoCalendarOutline } from 'react-icons/io5';
+import { Level } from '@/type';
+import { fetchUrl } from '@/lib/fetchUrl';
 
 const StudentFilterForm = () => {
     const router = useRouter();
-      const onFinish = (values: any) => {
-        const grade = values.grade || '';
-        const subject = values.subject || '';
-        const batch = values.batch || '';
-        const section = values.section || '';
+    const [subjects, setSubjects] = React.useState<any[]>([]);
+    const [batches, setBatches] = React.useState<any[]>([]);
+    const [sections, setSections] = React.useState<any[]>([]);
+    const [loading, setLoading] = React.useState(false);
 
-        const month = values.month ? values.month.format('MMMM') : '';
-        const year = values.year ? values.year.format('YYYY') : '';
+    React.useEffect(() => {
+        const loadInitialData = async () => {
+            try {
+                const [subjectRes, batchRes, sectionRes] = await Promise.all([
+                    fetchUrl('/subject'),
+                    fetchUrl('/batch'),
+                    fetchUrl('/section')
+                ]);
 
+                if (subjectRes?.success) setSubjects(subjectRes.data);
+                if (batchRes?.success) setBatches(batchRes.data);
+                if (sectionRes?.success) setSections(sectionRes.data);
+            } catch (error) {
+                console.error("Failed to fetch filter options:", error);
+            }
+        };
+        loadInitialData();
+    }, []);
+
+    const onFinish = (values: any) => {
         const params = new URLSearchParams({
-            grade,
-            subject,
-            batch,
-            section,
-            month,
-            year,
+            gradeName: values.grade || '',
+            subjectName: values.subject || '',
+            batchName: values.batch || '',
+            sectionName: values.section || '',
         });
 
-        router.push(`/report-card/filtered-student-list?${params.toString()}`);
+        router.push(`/student-list/assigned-student-list/filtered-student-list?${params.toString()}`);
     }
     return (
         <Form layout="vertical" className=' md:w-[50%] w-full' onFinish={onFinish}>
@@ -36,7 +52,7 @@ const StudentFilterForm = () => {
                 rules={[{ required: true, message: "Please select Grade" }]}
             >
                 <Select
-                    options={studentOptions}
+                    options={Object.values(Level).map(level => ({ label: level, value: level }))}
                     placeholder="Select Grade"
                     showSearch
                     optionFilterProp="label"
@@ -51,7 +67,7 @@ const StudentFilterForm = () => {
                 rules={[{ required: true, message: "Please select Subject" }]}
             >
                 <Select
-                    options={studentOptions}
+                    options={subjects.map(item => ({ label: item.name, value: item._id }))}
                     placeholder="Select Subject"
                     showSearch
                     optionFilterProp="label"
@@ -66,7 +82,7 @@ const StudentFilterForm = () => {
                 rules={[{ required: true, message: "Please select Batch" }]}
             >
                 <Select
-                    options={studentOptions}
+                    options={batches.map(item => ({ label: item.name, value: item._id }))}
                     placeholder="Select Batch"
                     showSearch
                     optionFilterProp="label"
@@ -81,7 +97,7 @@ const StudentFilterForm = () => {
                 rules={[{ required: true, message: "Please select Section" }]}
             >
                 <Select
-                    options={studentOptions}
+                    options={sections.map(item => ({ label: item.name, value: item._id }))}
                     placeholder="Select Section"
                     showSearch
                     optionFilterProp="label"

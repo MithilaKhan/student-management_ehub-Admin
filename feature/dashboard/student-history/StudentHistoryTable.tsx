@@ -1,16 +1,14 @@
 "use client";
 import React from 'react';
 import TableMain from '@/shared/TableMain';
-import studentHistoryData from '@/constants/dashboard/student-history-data';
 
-const StudentHistoryTable = () => {
+const StudentHistoryTable = ({ data, loading }: { data: any[], loading: boolean }) => {
   const columns = [
     {
       title: 'SL',
-      dataIndex: 'id',
-      key: 'id',
+      key: 'sl',
       width: 60,
-      render: (val: number) => val ?? '-',
+      render: (_: any, __: any, index: number) => index + 1,
     },
     {
       title: 'Student Name',
@@ -19,18 +17,18 @@ const StudentHistoryTable = () => {
     },
     {
       title: 'Batch Name',
-      dataIndex: 'batchName',
       key: 'batchName',
+      render: (record: any) => record.batchName?.name || record.batchName || '-',
     },
     {
       title: 'Batch Start',
-      dataIndex: 'batchStart',
       key: 'batchStart',
+      render: (record: any) => record.batchName?.startDate || record.batchStart || '-',
     },
     {
       title: 'Batch End',
-      dataIndex: 'batchEnd',
       key: 'batchEnd',
+      render: (record: any) => record.batchName?.endDate || record.batchEnd || '-',
     },
     {
       title: 'Enrolment Date',
@@ -55,10 +53,12 @@ const StudentHistoryTable = () => {
   return (
     <div>
       <TableMain
+        loading={loading}
         columns={columns}
-        dataSource={studentHistoryData}
+        dataSource={data}
         pagination={{ pageSize: 6}}
         className="w-full custom-table"
+        rowKey="_id"
       />
     </div>
   );
