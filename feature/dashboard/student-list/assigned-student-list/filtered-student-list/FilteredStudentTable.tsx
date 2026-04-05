@@ -7,13 +7,13 @@ import { fetchUrl } from '@/lib/fetchUrl';
 import { Modal } from 'antd';
 import { toast } from 'react-hot-toast';
 
-const FilteredStudentTable = ({ 
-  setIsOpen, 
-  refreshTrigger, 
-  onEdit, 
-  onRefresh 
-}: modalType & { 
-  refreshTrigger?: number; 
+const FilteredStudentTable = ({
+  setIsOpen,
+  refreshTrigger,
+  onEdit,
+  onRefresh
+}: modalType & {
+  refreshTrigger?: number;
   onEdit?: (student: any) => void;
   onRefresh?: () => void;
 }) => {
@@ -28,7 +28,8 @@ const FilteredStudentTable = ({
         const query = searchParams.toString();
         const res = await fetchUrl(`/assigned/filter?${query}`);
         if (res?.success) {
-          setStudents(res.data);
+          const data = Array.isArray(res.data) ? res.data : (res.data?.items || res.data?.data || res.data?.students || []);
+          setStudents(data);
         }
       } catch (error) {
         console.error("Failed to fetch filtered students:", error);
@@ -42,28 +43,28 @@ const FilteredStudentTable = ({
 
   const handleDelete = (id: string) => {
     Modal.confirm({
-        title: 'Are you sure you want to delete this student?',
-        content: 'This action cannot be undone.',
-        okText: 'Yes, Delete',
-        okType: 'danger',
-        cancelText: 'No',
-        async onOk() {
-            try {
-                const res = await fetchUrl(`/assigned/${id}`, { method: 'DELETE' });
-                if (res.success) {
-                    toast.success(res.message || 'Student deleted successfully');
-                    if (onRefresh) onRefresh();
-                } else {
-                    toast.error(res.message || 'Failed to delete student');
-                }
-            } catch (error) {
-                toast.error('An error occurred during deletion');
-            }
+      title: 'Are you sure you want to delete this student?',
+      content: 'This action cannot be undone.',
+      okText: 'Yes, Delete',
+      okType: 'danger',
+      cancelText: 'No',
+      async onOk() {
+        try {
+          const res = await fetchUrl(`/assigned/${id}`, { method: 'DELETE' });
+          if (res.success) {
+            toast.success(res.message || 'Student deleted successfully');
+            if (onRefresh) onRefresh();
+          } else {
+            toast.error(res.message || 'Failed to delete student');
+          }
+        } catch (error) {
+          toast.error('An error occurred during deletion');
         }
+      }
     });
   };
 
-const columns = [
+  const columns = [
     {
       title: 'SL',
       key: 'sl',
@@ -93,17 +94,17 @@ const columns = [
     {
       title: 'Batch',
       key: 'batch',
-      render: (record: any) => record.batchName?.name || '-',
+      render: (record: any) => record?.batchName?.name || '-',
     },
     {
       title: 'Subject',
       key: 'subject',
-      render: (record: any) => record.subjectName?.name || '-',
+      render: (record: any) => record?.subjectName?.name || '-',
     },
     {
       title: 'Section',
       key: 'section',
-      render: (record: any) => record.sectionName?.name || '-',
+      render: (record: any) => record?.sectionName?.name || '-',
     },
     {
       title: 'Special Fee',
@@ -112,14 +113,14 @@ const columns = [
       render: (val: string) => (val && val.trim() ? val : '-----'),
     },
     {
-        title: 'Status',
-        dataIndex: 'status',
-        key: 'status',
-        render: (val: string) => (
-            <span className={val === 'Waiting' ? 'text-yellow-500' : 'text-green-500'}>
-                {val || '-'}
-            </span>
-        )
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+      render: (val: string) => (
+        <span className={val === 'Waiting' ? 'text-yellow-500' : 'text-green-500'}>
+          {val || '-'}
+        </span>
+      )
     },
     {
       title: 'Download Form',
@@ -148,9 +149,9 @@ const columns = [
       <TableMain
         loading={loading}
         columns={columns}
-        dataSource={students} 
+        dataSource={students}
         rowKey="_id"
-         pagination={{
+        pagination={{
           pageSize: 7,
           total: students.length,
           showSizeChanger: false,

@@ -22,12 +22,13 @@ const theme = {
 
 const TableMain = <T,>({ className, pagination, ...rest }: Props<T>) => {
   const defaultPagination =
-    pagination ?? (Array.isArray(rest.dataSource) ? { pageSize: 10, total: rest.dataSource.length } : undefined);
+    pagination ?? (Array.isArray(rest?.dataSource) ? { pageSize: 10, total: rest?.dataSource?.length } : undefined);
 
   return (
     <ConfigProvider theme={theme}>
       <Table
         {...(rest as TableProps<T>)}
+        dataSource={Array.isArray(rest?.dataSource) ? rest.dataSource : []}
         pagination={defaultPagination}
         scroll={{ x: "max-content" }}
         className={[className, 'custom-table'].filter(Boolean).join(' ')}
