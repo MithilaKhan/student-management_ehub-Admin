@@ -10,10 +10,11 @@ interface FilteredStudentListProps {
 
 const FilteredStudentList = ({ reportCards }: FilteredStudentListProps) => {
     const search = useSearchParams();
-    const subject = search?.get("subjectName") || "-";
-    const batch = search?.get("batchName") || "-";
-    const section = search?.get("sectionName") || "-";
-    const grade = search?.get("gradeName") || "-";
+
+    const subject = reportCards?.[0]?.subjectName?.name || "-";
+    const batch = reportCards?.[0]?.batchName?.name || "-";
+    const section = reportCards?.[0]?.sectionName?.name || "-";
+    const grade = reportCards?.[0]?.gradeName || "-";
     const month = search?.get("month") || moment().format("MMMM");
     const year = search?.get("year") || moment().format("YYYY");
 
@@ -35,11 +36,11 @@ const FilteredStudentList = ({ reportCards }: FilteredStudentListProps) => {
                         <div className="text-[#1E88E5] font-semibold md:text-2xl text-xl md:flex-center gap-1 ">
                             <span> {month} </span> <span> {year}</span>
                         </div>
-                        <div className="text-[16px] text-[#ABABAB] mt-2 grid md:grid-cols-2 grid-cols-1 gap-y-1">
-                            <div><span className='font-medium pe-1'>Grade:</span>{grade}</div>
-                            <div><span className='font-medium pe-1'>Subject:</span>{subject}</div>
-                            <div><span className='font-medium pe-1'>Batch:</span>{batch}</div>
-                            <div><span className='font-medium pe-1'>Section:</span>{section}</div>
+                        <div className="text-[14px] text-[#D1D5DB] mt-3 grid md:grid-cols-2 grid-cols-1 gap-y-3 gap-x-6 bg-[#ffffff]/5 p-4 rounded-lg border border-[#ffffff]/10">
+                            <div className="flex items-center"><span className='font-semibold text-white min-w-[70px] uppercase text-xs tracking-wider'>Grade:</span><span className="text-[#1E88E5] font-semibold bg-[#1E88E5]/10 px-2 py-0.5 rounded ml-2">{grade}</span></div>
+                            <div className="flex items-center"><span className='font-semibold text-white min-w-[70px] uppercase text-xs tracking-wider'>Subject:</span><span className="ml-2">{subject}</span></div>
+                            <div className="flex items-center"><span className='font-semibold text-white min-w-[70px] uppercase text-xs tracking-wider'>Batch:</span><span className="ml-2">{batch}</span></div>
+                            <div className="flex items-center"><span className='font-semibold text-white min-w-[70px] uppercase text-xs tracking-wider'>Section:</span><span className="ml-2">{section}</span></div>
                         </div>
                     </div>
                 </div>
@@ -49,4 +50,4 @@ const FilteredStudentList = ({ reportCards }: FilteredStudentListProps) => {
     );
 };
 
-export default FilteredStudentList;
+export default FilteredStudentList;

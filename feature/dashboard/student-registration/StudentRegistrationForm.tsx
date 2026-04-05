@@ -109,6 +109,14 @@ const StudentRegistrationForm = () => {
         </Form.Item>
 
         <Form.Item
+          label={<label className="block text-sm text-[#9CA3AF]">Father's Email</label>}
+          name="fatherEmail"
+          rules={[{ type: 'email', message: 'Please enter valid email' }]}
+        >
+          <Input placeholder="Enter Father's Email" style={{ height: 45 }} />
+        </Form.Item>
+
+        <Form.Item
           label={<label className="block text-sm text-[#9CA3AF]">Mother's Name</label>}
           name="motherName"
         >
@@ -120,6 +128,14 @@ const StudentRegistrationForm = () => {
           name="motherContact"
         >
           <Input placeholder="Enter Mother's Contact" style={{ height: 45 }} />
+        </Form.Item>
+
+        <Form.Item
+          label={<label className="block text-sm text-[#9CA3AF]">Mother's Email</label>}
+          name="motherEmail"
+          rules={[{ type: 'email', message: 'Please enter valid email' }]}
+        >
+          <Input placeholder="Enter Mother's Email" style={{ height: 45 }} />
         </Form.Item>
 
         <Form.Item

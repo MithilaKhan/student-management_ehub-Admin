@@ -5,8 +5,25 @@ import HeaderTitle from '@/shared/HeaderTitle';
 import { FiSearch } from 'react-icons/fi';
 import ExamListTable from './ExamListTable';
 import ExamListModal from '@/ui/modal/ExamListModal';
-const ExamList = () => {
+
+interface ExamListProps {
+    data: any[];
+}
+
+const ExamList = ({ data }: ExamListProps) => {
     const [isOpen, setIsOpen] = useState(false);
+    const [editData, setEditData] = useState<any>(null);
+
+    const handleAddOpen = () => {
+        setEditData(null);
+        setIsOpen(true);
+    };
+
+    const handleEditOpen = (record: any) => {
+        setEditData(record);
+        setIsOpen(true);
+    };
+
     return (
         <div>
             <div className="">
@@ -22,19 +39,19 @@ const ExamList = () => {
                         />
 
                         <button
-                            type="submit"
+                            type="button"
                             className="bg-[#1A5FA4] h-[40px] w-full md:max-w-[200px] rounded-md text-white"
-                            onClick={() => setIsOpen(true)}
+                            onClick={handleAddOpen}
                         >
                             + Add Exam
                         </button>
                     </div>
                 </div>
-                <ExamListTable setIsOpen={setIsOpen} />
+                <ExamListTable data={data} onEdit={handleEditOpen} />
             </div>
-            <ExamListModal isOpen={isOpen} setIsOpen={setIsOpen} />
+            <ExamListModal isOpen={isOpen} setIsOpen={setIsOpen} initialData={editData} />
         </div>
     );
 };
 
-export default ExamList;
+export default ExamList;

@@ -1,62 +1,68 @@
 "use client";
 import React from "react";
-import { modalType } from "@/type";
-import { examListData } from "@/constants/dashboard/exam-module";
 import TableMain from "@/shared/TableMain";
+import moment from "moment";
+import { FiEdit } from "react-icons/fi";
 
-const ExamListTable = ({ setIsOpen }: modalType) => {
+interface ExamListTableProps {
+    data: any[];
+    onEdit: (record: any) => void;
+}
+
+const ExamListTable = ({ data, onEdit }: ExamListTableProps) => {
 
     const columns = [
         {
             title: "SL",
-            dataIndex: "key",
-            key: "key",
-            render: (val: string) => val ?? "-",
+            key: "sl",
+            width: 60,
+            render: (_: any, __: any, index: number) => index + 1,
         },
         {
             title: "Exam Title",
-            dataIndex: "examTitle",
             key: "examTitle",
+            render: (record: any) => (
+                <div>
+                    <div className="font-medium">{record.name || "-"}</div>
+                    <div className="text-xs text-gray-400">Date: {record.date ? moment(record.date).format('DD MMM YYYY') : '-'}</div>
+                </div>
+            )
         },
         {
             title: "Exam Type",
             dataIndex: "examType",
             key: "examType",
+            render: (val: string) => val ? val.replace('_', ' ') : "-"
         },
         {
             title: "Exam Details",
-            dataIndex: "examDetails",
             key: "examDetails",
+            render: (record: any) => (
+                <div className="text-sm">
+                    <div>{record.details || "-"}</div>
+                    <div className="text-xs text-gray-400">Duration: {record.duration} | Marks: {record.totalMarks}</div>
+                </div>
+            )
         },
         {
             title: "Subject Exam",
-            dataIndex: "subjectExam",
             key: "subjectExam",
+            render: (record: any) => record.subjectId?.name || "-"
         },
         {
             title: "Batch Name",
-            dataIndex: "batchName",
             key: "batchName",
-        },
-        {
-            title: "Is Active",
-            dataIndex: "isActive",
-            key: "isActive",
-            render: (val: string) => (
-                <span className={val?.toLowerCase() === "active" ? "text-green-400" : "text-red-400"}>
-                    {val}
-                </span>
-            ),
+            render: (record: any) => record.batchId?.name || "-"
         },
         {
             title: "Action",
             key: "action",
-            render: () => (
+            render: (_: any, record: any) => (
                 <button
-                    onClick={() => setIsOpen(true)}
-                    className="text-[#FF4D4D] cursor-pointer"
+                    onClick={() => onEdit(record)}
+                    className="text-[#FF4D4D] cursor-pointer flex items-center gap-1"
                 >
-                    Edit
+                    <FiEdit size={16} /> Edit
                 </button>
             ),
         },
@@ -66,8 +72,9 @@ const ExamListTable = ({ setIsOpen }: modalType) => {
         <div className="custom-table w-full">
             <TableMain
                 columns={columns}
-                dataSource={examListData}
+                dataSource={data}
                 pagination={{ pageSize: 10 }}
+                rowKey="_id"
                 rowClassName="custom-table"
             />
         </div>
@@ -75,3 +82,4 @@ const ExamListTable = ({ setIsOpen }: modalType) => {
 };
 
 export default ExamListTable;
+

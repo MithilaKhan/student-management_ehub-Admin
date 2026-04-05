@@ -82,23 +82,28 @@ const StudentReportTable = ({ data = [] }: StudentReportTableProps) => {
       ),
       dataIndex: "studentEmail",
       key: "studentEmail",
-      render: (email: string) => (
-        <Checkbox
-          checked={selectedStudentEmails.includes(email)}
-          onChange={(e) => {
-            if (e.target.checked) {
-              setSelectedStudentEmails([...selectedStudentEmails, email]);
-            } else {
-              setSelectedStudentEmails(
-                selectedStudentEmails.filter((item) => item !== email)
-              );
-            }
-          }}
-          disabled={email === "No Email"}
-        >
-          {email}
-        </Checkbox>
-      ),
+      render: (email: string) => {
+        if (email === "No Email" || !email) {
+          return <span className="text-[#6B7280] italic text-xs">Not Provided</span>;
+        }
+        return (
+          <Checkbox
+            checked={selectedStudentEmails.includes(email)}
+            onChange={(e) => {
+              if (e.target.checked) {
+                setSelectedStudentEmails([...selectedStudentEmails, email]);
+              } else {
+                setSelectedStudentEmails(
+                  selectedStudentEmails.filter((item) => item !== email)
+                );
+              }
+            }}
+            className="text-[#E5E7EB]"
+          >
+            {email}
+          </Checkbox>
+        );
+      },
     },
     {
       title: (
@@ -117,24 +122,28 @@ const StudentReportTable = ({ data = [] }: StudentReportTableProps) => {
       ),
       dataIndex: "fatherEmail",
       key: "fatherEmail",
-      render: (email: string) => (
-        <Checkbox
-          checked={selectedFatherEmails.includes(email)} 
-          style={{color:"white"}}
-          onChange={(e) => {
-            if (e.target.checked) {
-              setSelectedFatherEmails([...selectedFatherEmails, email]);
-            } else {
-              setSelectedFatherEmails(
-                selectedFatherEmails.filter((item) => item !== email)
-              );
-            }
-          }}
-          disabled={email === "No Email"}
-        >
-          {email}
-        </Checkbox>
-      ),
+      render: (email: string) => {
+        if (email === "No Email" || !email) {
+          return <span className="text-[#6B7280] italic text-xs">Not Provided</span>;
+        }
+        return (
+          <Checkbox
+            checked={selectedFatherEmails.includes(email)} 
+            className="text-[#E5E7EB]"
+            onChange={(e) => {
+              if (e.target.checked) {
+                setSelectedFatherEmails([...selectedFatherEmails, email]);
+              } else {
+                setSelectedFatherEmails(
+                  selectedFatherEmails.filter((item) => item !== email)
+                );
+              }
+            }}
+          >
+            {email}
+          </Checkbox>
+        );
+      },
     },
     {
       title: (
@@ -153,23 +162,28 @@ const StudentReportTable = ({ data = [] }: StudentReportTableProps) => {
       ),
       dataIndex: "motherEmail",
       key: "motherEmail",
-      render: (email: string) => (
-        <Checkbox
-          checked={selectedMotherEmails.includes(email)}
-          onChange={(e) => {
-            if (e.target.checked) {
-              setSelectedMotherEmails([...selectedMotherEmails, email]);
-            } else {
-              setSelectedMotherEmails(
-                selectedMotherEmails.filter((item) => item !== email)
-              );
-            }
-          }}
-          disabled={email === "No Email"}
-        >
-          {email}
-        </Checkbox>
-      ),
+      render: (email: string) => {
+        if (email === "No Email" || !email) {
+          return <span className="text-[#6B7280] italic text-xs">Not Provided</span>;
+        }
+        return (
+          <Checkbox
+            checked={selectedMotherEmails.includes(email)}
+            className="text-[#E5E7EB]"
+            onChange={(e) => {
+              if (e.target.checked) {
+                setSelectedMotherEmails([...selectedMotherEmails, email]);
+              } else {
+                setSelectedMotherEmails(
+                  selectedMotherEmails.filter((item) => item !== email)
+                );
+              }
+            }}
+          >
+            {email}
+          </Checkbox>
+        );
+      },
     },
   ];
 

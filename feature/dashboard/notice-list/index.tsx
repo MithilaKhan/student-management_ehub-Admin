@@ -12,6 +12,18 @@ interface NoticeListProps {
 
 const NoticeList = ({ data }: NoticeListProps) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [editData, setEditData] = useState<any>(null);
+
+  const handleAddOpen = () => {
+    setEditData(null);
+    setIsOpen(true);
+  };
+
+  const handleEditOpen = (record: any) => {
+    setEditData(record);
+    setIsOpen(true);
+  };
+
   return (
     <div>
       <div className="flex md:flex-row flex-col md:items-center md:justify-between md:space-y-0 space-y-4 mb-6">
@@ -26,16 +38,16 @@ const NoticeList = ({ data }: NoticeListProps) => {
           />
 
           <button
-            type="submit"
+            type="button"
             className="bg-[#1A5FA4] h-[40px] w-full md:max-w-[200px] rounded-md text-white"
-            onClick={() => setIsOpen(true)}
+            onClick={handleAddOpen}
           >
             + Add Notice
           </button>
         </div>
       </div>
-      <NoticeTable data={data} setIsOpen={setIsOpen} />
-      <AddNoticeModal isOpen={isOpen} setIsOpen={setIsOpen} />
+      <NoticeTable data={data} onEdit={handleEditOpen} />
+      <AddNoticeModal isOpen={isOpen} setIsOpen={setIsOpen} initialData={editData} />
     </div>
   );
 };

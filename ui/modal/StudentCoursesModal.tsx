@@ -169,6 +169,14 @@ const StudentCoursesModal = ({
                     </Form.Item>
 
                     <Form.Item
+                        label={<label className="block text-sm text-[#9CA3AF]">Father's Email</label>}
+                        name="fatherEmail"
+                        rules={[{ type: 'email', message: 'Please enter valid email' }]}
+                    >
+                        <Input placeholder="Enter Father's Email" style={{ height: 45 }} />
+                    </Form.Item>
+
+                    <Form.Item
                         label={<label className="block text-sm text-[#9CA3AF]">Mother's Name</label>}
                         name="motherName"
                         rules={[{ required: true, message: "Please enter Mother's Name" }]}
@@ -182,6 +190,14 @@ const StudentCoursesModal = ({
                         rules={[{ required: true, message: "Please enter Mother's Contact" }]}
                     >
                         <Input placeholder="Enter Mother's Contact" style={{ height: 45 }} />
+                    </Form.Item>
+
+                    <Form.Item
+                        label={<label className="block text-sm text-[#9CA3AF]">Mother's Email</label>}
+                        name="motherEmail"
+                        rules={[{ type: 'email', message: 'Please enter valid email' }]}
+                    >
+                        <Input placeholder="Enter Mother's Email" style={{ height: 45 }} />
                     </Form.Item>
 
                     <Form.Item

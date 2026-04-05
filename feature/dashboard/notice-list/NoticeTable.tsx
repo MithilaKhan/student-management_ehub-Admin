@@ -1,4 +1,3 @@
-"use client";
 import React from "react";
 import TableMain from "@/shared/TableMain";
 import { FiEdit } from "react-icons/fi";
@@ -6,10 +5,10 @@ import moment from "moment";
 
 interface NoticeTableProps {
   data: any[];
-  setIsOpen: (isOpen: boolean) => void;
+  onEdit: (record: any) => void;
 }
 
-const NoticeTable = ({ data, setIsOpen }: NoticeTableProps) => {
+const NoticeTable = ({ data, onEdit }: NoticeTableProps) => {
   const columns = [
     {
       title: "SL",
@@ -23,7 +22,7 @@ const NoticeTable = ({ data, setIsOpen }: NoticeTableProps) => {
       render: (record: any) => (
         <div className="text-sm text-[#ABABAB] whitespace-pre-line">
           <div className="font-medium text-white">{record.title}</div>
-          <div>{record.description}</div>
+          <div dangerouslySetInnerHTML={{ __html: record.description }} />
         </div>
       ),
     },
@@ -63,7 +62,7 @@ const NoticeTable = ({ data, setIsOpen }: NoticeTableProps) => {
       width: 80,
       render: (_: any, record: any) => (
         <button
-          onClick={() => setIsOpen(true)}
+          onClick={() => onEdit(record)}
           className="text-red-500 hover:underline flex items-center gap-2"
         >
           <FiEdit />
