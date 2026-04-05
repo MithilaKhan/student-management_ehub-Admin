@@ -21,7 +21,10 @@ const MarksEntryPage = async ({ searchParams }: { searchParams: { [key: string]:
 
     return (
         <div>
-            <MarksEntry data={marksData} />
+            <MarksEntry 
+                data={marksData} 
+                filters={{ batchId, subjectId, examId, level }} 
+            />
         </div>
     );
 };

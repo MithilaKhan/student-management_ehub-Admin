@@ -7,9 +7,15 @@ import MarksEntryDetailed from './MarksEntryDetailed';
 
 interface MarksEntryProps {
     data?: any[] | null;
+    filters?: {
+        batchId?: string;
+        subjectId?: string;
+        examId?: string;
+        level?: string;
+    };
 }
 
-const MarksEntry = ({ data }: MarksEntryProps) => {
+const MarksEntry = ({ data, filters }: MarksEntryProps) => {
     const router = useRouter();
 
     const handleBack = () => {
@@ -41,7 +47,7 @@ const MarksEntry = ({ data }: MarksEntryProps) => {
                 </div> 
             ) : (
                 <div className="mt-4">
-                    <MarksEntryDetailed data={selectedRecord} />
+                    <MarksEntryDetailed data={selectedRecord} filters={filters} />
                 </div>
             )}
         </div>

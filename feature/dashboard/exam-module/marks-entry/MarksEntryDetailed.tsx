@@ -6,9 +6,15 @@ import toast from 'react-hot-toast';
 
 interface MarksEntryDetailedProps {
     data: any;
+    filters?: {
+        batchId?: string;
+        subjectId?: string;
+        examId?: string;
+        level?: string;
+    };
 }
 
-const MarksEntryDetailed = ({ data }: MarksEntryDetailedProps) => {
+const MarksEntryDetailed = ({ data, filters }: MarksEntryDetailedProps) => {
     // Build state for student marks: { [studentId]: { paper1: string } }
     const [marks, setMarks] = useState<Record<string, { paper1: string }>>({});
     const [loading, setLoading] = useState(false);
@@ -30,13 +36,6 @@ const MarksEntryDetailed = ({ data }: MarksEntryDetailedProps) => {
     }, [data]);
 
     const getPaperValue = (studentId: string) => marks[studentId]?.paper1 ?? '';
-
-    const getTotal = (studentId: string) => {
-        const val = getPaperValue(studentId);
-        if (val === '' || val === undefined) return '';
-        const num = parseFloat(val);
-        return isNaN(num) ? '' : String(num);
-    };
 
     const getPercentage = (studentId: string, totalMarks: number) => {
         const val = getPaperValue(studentId);
@@ -62,30 +61,55 @@ const MarksEntryDetailed = ({ data }: MarksEntryDetailedProps) => {
     };
 
     const handleSubmit = async () => {
-        if (!data?._id) {
-            toast.error("Record ID not found. Cannot save.");
+        // Prioritize IDs from filters (from search params) then from the data object
+        const examId = filters?.examId || data?.examId?._id || data?.examId || "";
+        const subjectId = filters?.subjectId || data?.subjectId?._id || data?.subjectId || "";
+        const batchId = filters?.batchId || data?.batchId?._id || data?.batchId || "";
+
+        if (!examId || !subjectId || !batchId) {
+            toast.error("Missing required IDs (Exam, Subject, or Batch).");
             return;
         }
         
         setLoading(true);
         try {
-            const studentMarks = students.map((s: any) => ({
-                studentId: s.studentId,
-                marks: marks[s.studentId]?.paper1 !== '' ? parseFloat(marks[s.studentId]?.paper1 || '0') : null,
-            }));
+            const studentMarks = students.map((s: any) => {
+                const markVal = marks[s.studentId]?.paper1;
+                const marksObtained = markVal !== '' ? parseFloat(markVal || '0') : 0;
+                const totalMarks = s.totalMarks || 0;
+                
+                // Using "parcentage" spelling as per user's Postman screenshot
+                const parcentage = totalMarks > 0 
+                    ? String(((marksObtained / totalMarks) * 100).toFixed(0)) 
+                    : "0";
 
-            const res = await fetchUrl(`/marksEntry/${data._id}`, {
-                method: 'PATCH',
-                body: JSON.stringify({ studentMarks }),
+                return {
+                    studentId: s.studentId,
+                    marksObtained,
+                    totalMarks,
+                    parcentage
+                };
+            });
+
+            const payload = {
+                examId,
+                subjectId,
+                batchId,
+                students: studentMarks
+            };
+
+            const res = await fetchUrl('/marksEntry', {
+                method: 'POST',
+                body: JSON.stringify(payload),
             });
 
             if (res?.success) {
-                toast.success('Marks updated successfully');
+                toast.success('Marks updated and sent successfully');
             } else {
-                toast.error(res?.message || 'Failed to update marks');
+                toast.error(res?.message || 'Failed to submit marks');
             }
         } catch (err) {
-            toast.error('An error occurred');
+            toast.error('An error occurred during submission');
             console.error(err);
         } finally {
             setLoading(false);
