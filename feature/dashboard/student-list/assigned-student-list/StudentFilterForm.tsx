@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { Level } from '@/type';
 import { fetchUrl } from '@/lib/fetchUrl';
 
-const StudentFilterForm = () => {  
+const StudentFilterForm = () => {
     const router = useRouter();
     const [subjects, setSubjects] = React.useState<any[]>([]);
     const [batches, setBatches] = React.useState<any[]>([]);
@@ -20,9 +20,9 @@ const StudentFilterForm = () => {
                     fetchUrl('/batch'),
                     fetchUrl('/section')
                 ]);
-                if (subRes?.success) setSubjects(subRes.data);
-                if (batRes?.success) setBatches(batRes.data);
-                if (secRes?.success) setSections(secRes.data);
+                if (subRes?.success) setSubjects(subRes?.data);
+                if (batRes?.success) setBatches(batRes?.data);
+                if (secRes?.success) setSections(secRes?.data);
             } catch (err) {
                 console.error("Filter options fetch error:", err);
             }
@@ -61,7 +61,7 @@ const StudentFilterForm = () => {
                 rules={[{ required: true, message: "Please enter Subject Name" }]}
             >
                 <Select
-                    options={subjects.map(item => ({ label: item.name, value: item._id }))}
+                    options={subjects?.map(item => ({ label: item.name, value: item._id }))}
                     placeholder="Select Subject"
                     showSearch
                     optionFilterProp="label"
@@ -75,7 +75,7 @@ const StudentFilterForm = () => {
                 rules={[{ required: true, message: "Please enter Batch Name" }]}
             >
                 <Select
-                    options={batches.map(item => ({ label: item.name, value: item._id }))}
+                    options={batches?.map(item => ({ label: item.name, value: item._id }))}
                     placeholder="Select Batch"
                     showSearch
                     optionFilterProp="label"
@@ -89,7 +89,7 @@ const StudentFilterForm = () => {
                 rules={[{ required: true, message: "Please enter Section Name" }]}
             >
                 <Select
-                    options={sections.map(item => ({ label: item.name, value: item._id }))}
+                    options={sections?.map(item => ({ label: item.name, value: item._id }))}
                     placeholder="Select Section"
                     showSearch
                     optionFilterProp="label"
@@ -100,7 +100,7 @@ const StudentFilterForm = () => {
 
             <Form.Item className="mt-6 flex justify-end">
                 <button type="submit" className=" bg-[#1A5FA4] h-[45px]  px-8 rounded-md text-white">
-                   Get Filtered Student List
+                    Get Filtered Student List
                 </button>
             </Form.Item>
         </Form>
