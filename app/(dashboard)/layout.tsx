@@ -16,9 +16,13 @@ const layout = async ({ children }: { children: React.ReactNode }) => {
         if (response?.success) {
             userProfile = response.data;
         }
-    } catch (error) {
+    } catch (error: any) {
+        // If it's a redirect error (from fetchServer), we MUST re-throw it 
+        // so Next.js can handle the redirection.
+        if (error?.digest?.startsWith('NEXT_REDIRECT')) {
+            throw error;
+        }
         console.error("Failed to fetch user profile in layout:", error);
-        // the fetchUrl automatically handles 401s by redirecting to login.
     }
 
     return (

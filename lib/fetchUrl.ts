@@ -49,12 +49,19 @@ export async function fetchUrl<T = any>(endpoint: string, options: FetchOptions 
     });
 
     if (response.status === 401) {
-      // Handle unauthorized errors
+      // Handle unauthorized errors: Clear all possible auth data
       if (typeof window !== 'undefined') {
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
-        document.cookie = 'accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-        document.cookie = 'refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+        localStorage.removeItem('user');
+        
+        // Clear cookies more thoroughly
+        const cookies = ['accessToken', 'refreshToken'];
+        cookies.forEach(name => {
+          document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+          document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${window.location.hostname};`;
+        });
+
         window.location.href = '/login';
       }
       throw new Error('Unauthorized');

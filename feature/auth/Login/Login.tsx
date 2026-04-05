@@ -8,7 +8,22 @@ import toast from "react-hot-toast";
 
 const Login = () => {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = React.useState(false);
+
+  // Clear all session data on mount
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+      localStorage.removeItem("user");
+
+      // Clear cookies
+      const cookies = ['accessToken', 'refreshToken'];
+      cookies.forEach(name => {
+        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+      });
+    }
+  }, []);
 
   const onFinish = async (values: any) => {
     try {

@@ -1,5 +1,6 @@
 import { cookies } from 'next/headers';
 import { fetchUrl, FetchOptions } from './fetchUrl';
+import { redirect } from 'next/navigation';
 
 /**
  * A reusable fetch utility specifically for Next.js Server Components.
@@ -15,5 +16,13 @@ export async function fetchServer<T = any>(endpoint: string, options: FetchOptio
     headers['Authorization'] = `Bearer ${token}`;
   }
 
-  return fetchUrl<T>(endpoint, { ...options, headers });
+  try {
+    return await fetchUrl<T>(endpoint, { ...options, headers });
+  } catch (error: any) {
+    // Detect 401 from fetchUrl throw
+    if (error.message === 'Unauthorized') {
+      redirect('/login');
+    }
+    throw error;
+  }
 }

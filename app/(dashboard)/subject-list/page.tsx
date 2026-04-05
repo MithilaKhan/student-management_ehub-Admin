@@ -11,7 +11,10 @@ const subjectListPage = async () => {
         if (res?.success) {
             fetchedData = res.data;
         }
-    } catch (e) {
+    } catch (e: any) {
+        if (e?.digest?.startsWith('NEXT_REDIRECT')) {
+            throw e;
+        }
         console.error("Failed to fetch subjects:", e);
     }
 
