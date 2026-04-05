@@ -1,38 +1,22 @@
 "use client";
 import React from 'react';
 import { DatePicker, Form, Select } from 'antd';
-import { studentOptions } from '@/constants/dashboard/class-routine-data';
 import { MdArrowDropDown } from 'react-icons/md';
 import { useRouter } from 'next/navigation';
 import { IoCalendarOutline } from 'react-icons/io5';
 import { Level } from '@/type';
-import { fetchUrl } from '@/lib/fetchUrl';
 
-const StudentFilterForm = () => {
+interface StudentFilterFormProps {
+    initialData: {
+        subjects: any[];
+        batches: any[];
+        sections: any[];
+    };
+}
+
+const StudentFilterForm = ({ initialData }: StudentFilterFormProps) => {
     const router = useRouter();
-    const [subjects, setSubjects] = React.useState<any[]>([]);
-    const [batches, setBatches] = React.useState<any[]>([]);
-    const [sections, setSections] = React.useState<any[]>([]);
-    const [loading, setLoading] = React.useState(false);
-
-    React.useEffect(() => {
-        const loadInitialData = async () => {
-            try {
-                const [subjectRes, batchRes, sectionRes] = await Promise.all([
-                    fetchUrl('/subject'),
-                    fetchUrl('/batch'),
-                    fetchUrl('/section')
-                ]);
-
-                if (subjectRes?.success) setSubjects(subjectRes.data);
-                if (batchRes?.success) setBatches(batchRes.data);
-                if (sectionRes?.success) setSections(sectionRes.data);
-            } catch (error) {
-                console.error("Failed to fetch filter options:", error);
-            }
-        };
-        loadInitialData();
-    }, []);
+    const { subjects, batches, sections } = initialData;
 
     const onFinish = (values: any) => {
         const params = new URLSearchParams({
@@ -42,7 +26,7 @@ const StudentFilterForm = () => {
             sectionName: values.section || '',
         });
 
-        router.push(`/student-list/assigned-student-list/filtered-student-list?${params.toString()}`);
+        router.push(`/report-card?${params.toString()}`);
     }
     return (
         <Form layout="vertical" className=' md:w-[50%] w-full' onFinish={onFinish}>
@@ -143,4 +127,4 @@ const StudentFilterForm = () => {
     );
 };
 
-export default StudentFilterForm;
+export default StudentFilterForm;

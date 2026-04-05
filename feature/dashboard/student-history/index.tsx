@@ -6,8 +6,13 @@ import FilterForm from './FilterForm';
 import { Input } from 'antd';
 import { FiSearch } from 'react-icons/fi';
 import StudentHistoryTable from './StudentHistoryTable';
-const StudentHistory = () => {
-    const [history, setHistory] = useState<any[]>([]);
+
+interface StudentHistoryProps {
+    initialHistory?: any[];
+}
+
+const StudentHistory = ({ initialHistory = [] }: StudentHistoryProps) => {
+    const [history, setHistory] = useState<any[]>(initialHistory);
     const [loading, setLoading] = useState(false);
 
     const handleFilter = async (id: string) => {

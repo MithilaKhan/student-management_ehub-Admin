@@ -4,14 +4,18 @@ import { FiEdit } from 'react-icons/fi';
 import moment from "moment";
 import StudentReportTable from './FilteredStudentTable';
 
-const FilteredStudentList = () => {
+interface FilteredStudentListProps {
+    reportCards: any[];
+}
+
+const FilteredStudentList = ({ reportCards }: FilteredStudentListProps) => {
     const search = useSearchParams();
-    const subject = search?.get("subject") ?? "IAL Accounting A2";
-    const batch = search?.get("batch") ?? "IAL - A2 Accounting May 2026 B#1";
-    const section = search?.get("section") ?? "Batch 01";
-    const grade = search?.get("grade") ?? "A+";
-    const month = search?.get("month") ?? moment().format("MMMM");
-    const year = search?.get("year") ?? moment().format("YYYY");
+    const subject = search?.get("subjectName") || "-";
+    const batch = search?.get("batchName") || "-";
+    const section = search?.get("sectionName") || "-";
+    const grade = search?.get("gradeName") || "-";
+    const month = search?.get("month") || moment().format("MMMM");
+    const year = search?.get("year") || moment().format("YYYY");
 
     return (
         <div>
@@ -23,7 +27,7 @@ const FilteredStudentList = () => {
                             <FiEdit className="text-white" />
                         </div>
                         <h3 className="text-white text-lg font-medium">
-                            Filtered Student List For Attendance
+                            Filtered Student List For Report Card
                         </h3>
                     </div>
 
@@ -39,10 +43,10 @@ const FilteredStudentList = () => {
                         </div>
                     </div>
                 </div>
-                <StudentReportTable  />
+                <StudentReportTable data={reportCards} />
             </div>
         </div>
     );
 };
 
-export default FilteredStudentList;
+export default FilteredStudentList;

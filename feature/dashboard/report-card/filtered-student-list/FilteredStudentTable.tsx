@@ -1,33 +1,40 @@
 "use client";
 
 import React, { useState } from "react";
-import { Table, Button, Checkbox } from "antd";
+import { Checkbox } from "antd";
 import TableMain from "@/shared/TableMain";
 
-const StudentReportTable = () => {
+interface StudentReportTableProps {
+  data: any[];
+}
+
+const StudentReportTable = ({ data = [] }: StudentReportTableProps) => {
   const [selectedStudentEmails, setSelectedStudentEmails] = useState<string[]>([]);
   const [selectedFatherEmails, setSelectedFatherEmails] = useState<string[]>([]);
   const [selectedMotherEmails, setSelectedMotherEmails] = useState<string[]>([]);
 
-  const dataSource = Array.from({ length: 7 }).map((_, i) => ({
+  const dataSource = data.map((item, i) => ({
+    ...item,
     key: i + 1,
-    studentName: "Adiyat Rahman",
-    batch: "IAL - A2 Accounting May 2026 B#1",
-    subject: "IAL Accounting A2",
-    section: "Batch 01",
-    studentEmail: "1adiat20anjumj@gmail.com",
-    fatherEmail: "abc@gamil.com",
-    motherEmail: "abc@gamil.com",
+    studentName: item.name || "-",
+    batch: item.batchName?.name || (typeof item.batchName === 'string' ? item.batchName : "-"),
+    subject: item.subjectName?.name || (typeof item.subjectName === 'string' ? item.subjectName : "-"),
+    section: item.sectionName?.name || (typeof item.sectionName === 'string' ? item.sectionName : "-"),
+    studentEmail: item.email || "No Email",
+    fatherEmail: item.fatherEmail || "No Email",
+    motherEmail: item.motherEmail || "No Email",
   }));
 
   const handleSelectAll = (type: string, checked: boolean) => {
-    const allEmails = dataSource.map((data) => data.studentEmail);
     if (type === "student") {
-      setSelectedStudentEmails(checked ? allEmails : []);
+      const emails = dataSource.map((data) => data.studentEmail).filter(e => e !== "No Email");
+      setSelectedStudentEmails(checked ? emails : []);
     } else if (type === "father") {
-      setSelectedFatherEmails(checked ? allEmails : []);
+      const emails = dataSource.map((data) => data.fatherEmail).filter(e => e !== "No Email");
+      setSelectedFatherEmails(checked ? emails : []);
     } else if (type === "mother") {
-      setSelectedMotherEmails(checked ? allEmails : []);
+      const emails = dataSource.map((data) => data.motherEmail).filter(e => e !== "No Email");
+      setSelectedMotherEmails(checked ? emails : []);
     }
   };
 
@@ -65,8 +72,8 @@ const StudentReportTable = () => {
           <Checkbox
             onChange={(e) => handleSelectAll("student", e.target.checked)}
             checked={
-              selectedStudentEmails.length === dataSource.length &&
-              dataSource.length > 0
+              selectedStudentEmails.length > 0 &&
+              selectedStudentEmails.length === dataSource.filter(d => d.studentEmail !== "No Email").length
             }
           >
             Select All
@@ -87,6 +94,7 @@ const StudentReportTable = () => {
               );
             }
           }}
+          disabled={email === "No Email"}
         >
           {email}
         </Checkbox>
@@ -99,8 +107,8 @@ const StudentReportTable = () => {
           <Checkbox
             onChange={(e) => handleSelectAll("father", e.target.checked)}
             checked={
-              selectedFatherEmails.length === dataSource.length &&
-              dataSource.length > 0
+              selectedFatherEmails.length > 0 &&
+              selectedFatherEmails.length === dataSource.filter(d => d.fatherEmail !== "No Email").length
             }
           >
             Select All
@@ -135,8 +143,8 @@ const StudentReportTable = () => {
           <Checkbox
             onChange={(e) => handleSelectAll("mother", e.target.checked)}
             checked={
-              selectedMotherEmails.length === dataSource.length &&
-              dataSource.length > 0
+              selectedMotherEmails.length > 0 &&
+              selectedMotherEmails.length === dataSource.filter(d => d.motherEmail !== "No Email").length
             }
           >
             Select All
@@ -185,11 +193,11 @@ const StudentReportTable = () => {
         columns={columns}
         dataSource={dataSource}
         rowKey="key"
-        pagination={{ pageSize: 7 }}
+        pagination={{ pageSize: 15 }}
         className="w-full custom-table"
       />
 
-   <div className="flex justify-end gap-4 mt-6">
+    <div className="flex justify-end gap-4 mt-6">
         <button
           onClick={handleReset}
           className="bg-[#3E1B1F] text-red-500 h-[40px] px-6 rounded-md"

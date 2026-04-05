@@ -1,8 +1,12 @@
 "use client";
 import React from 'react';
 import TableMain from '@/shared/TableMain';
-import subscriptionData from '@/constants/dashboard/monthly-subscription-fee-data';
-const MonthlySubscriptionTable = () => {
+
+interface MonthlySubscriptionTableProps {
+    data: any[];
+}
+
+const MonthlySubscriptionTable = ({ data }: MonthlySubscriptionTableProps) => {
 
   const columns = [
     {
@@ -10,7 +14,7 @@ const MonthlySubscriptionTable = () => {
       dataIndex: 'id',
       key: 'id',
       width: 60,
-      render: (v: number) => v ?? '-'
+      render: (_: any, __: any, index: number) => index + 1
     },
     { title: 'Student Name', dataIndex: 'studentName', key: 'studentName' },
     { title: 'Subject name', dataIndex: 'subjectName', key: 'subjectName' },
@@ -24,10 +28,10 @@ const MonthlySubscriptionTable = () => {
     <div>
       <TableMain
         columns={columns}
-        dataSource={subscriptionData}
-        rowKey="id"
+        dataSource={data}
+        rowKey={(record: any) => record._id || record.id || Math.random()}
         className="w-full custom-table"
-        pagination={{ pageSize: 5 }}
+        pagination={{ pageSize: 15 }}
       />
     </div>
   );

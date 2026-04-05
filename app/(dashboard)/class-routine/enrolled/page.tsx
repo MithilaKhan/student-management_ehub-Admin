@@ -1,10 +1,14 @@
 import StudentEnrolled from '@/feature/dashboard/class-routine/enrolled';
+import { fetchServer } from '@/lib/fetchServer';
 import React from 'react';
 
-const enrolledPage = () => {
+const enrolledPage = async () => {
+    const res = await fetchServer('/assigned');
+    const students = res?.data || [];
+
     return (
         <div>
-           <StudentEnrolled/>
+           <StudentEnrolled data={students}/>
         </div>
     );
 };

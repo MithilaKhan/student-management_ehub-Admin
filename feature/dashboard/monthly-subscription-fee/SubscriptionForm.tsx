@@ -2,15 +2,25 @@
 import React from 'react';
 import { DatePicker, Form } from 'antd';
 import { IoCalendarOutline } from 'react-icons/io5';
+import { useRouter } from 'next/navigation';
+
 const SubscriptionForm = () => {
     const [form] = Form.useForm();
+    const router = useRouter();
 
     const onFinish = (values: any) => {
-        console.log('Form values:', values);
+        const month = values.month ? (values.month.month() + 1) : '';
+        const year = values.year ? values.year.year() : '';
+        
+        if (month && year) {
+            router.push(`/monthly-subscription-fee?month=${month}&year=${year}`);
+        }
     };
+
     const handleReset = () => {
         form.resetFields();
     };
+
     return (
         <Form
             form={form}
@@ -22,6 +32,7 @@ const SubscriptionForm = () => {
                 <Form.Item
                     label={<label className="block text-sm text-[#9CA3AF]">Select Month</label>}
                     name="month"
+                    rules={[{ required: true, message: 'Please select Month' }]}
                 >
                     <DatePicker
                         picker="month"
@@ -35,6 +46,7 @@ const SubscriptionForm = () => {
                 <Form.Item
                     label={<label className="block text-sm text-[#9CA3AF]">Select Year</label>}
                     name="year"
+                    rules={[{ required: true, message: 'Please select Year' }]}
                 >
                     <DatePicker
                         picker="year"
@@ -65,4 +77,4 @@ const SubscriptionForm = () => {
     );
 };
 
-export default SubscriptionForm;
+export default SubscriptionForm;

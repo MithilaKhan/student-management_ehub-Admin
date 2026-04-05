@@ -6,7 +6,11 @@ import { Input } from "antd";
 import NoticeTable from "./NoticeTable";
 import AddNoticeModal from "./AddNoticeModal";
 
-const NoticeList = () => {
+interface NoticeListProps {
+  data: any[];
+}
+
+const NoticeList = ({ data }: NoticeListProps) => {
   const [isOpen, setIsOpen] = useState(false);
   return (
     <div>
@@ -30,7 +34,7 @@ const NoticeList = () => {
           </button>
         </div>
       </div>
-      <NoticeTable setIsOpen={setIsOpen} />
+      <NoticeTable data={data} setIsOpen={setIsOpen} />
       <AddNoticeModal isOpen={isOpen} setIsOpen={setIsOpen} />
     </div>
   );

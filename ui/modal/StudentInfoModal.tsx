@@ -1,7 +1,50 @@
+"use client";
 import { modalType } from '@/type';
 import { Form, Input, Modal } from 'antd';
+import React, { useState } from 'react';
+import { fetchUrl } from '@/lib/fetchUrl';
+import { toast } from 'react-hot-toast';
+import { useRouter } from 'next/navigation';
 
 const StudentInfoModal = ({ isOpen, setIsOpen }: modalType) => {
+    const [form] = Form.useForm();
+    const [loading, setLoading] = useState(false);
+    const router = useRouter();
+
+    const onFinish = async (values: any) => {
+        setLoading(true);
+        try {
+            const payload = {
+                ...values,
+                name: `${values.firstName} ${values.lastName}`,
+                role: 'STUDENT',
+                password: '00000000', // Default password as per screenshot
+            };
+
+            // Remove firstName and lastName from payload
+            delete payload.firstName;
+            delete payload.lastName;
+
+            const res = await fetchUrl('/user/staff', {
+                method: 'POST',
+                body: JSON.stringify(payload),
+            });
+
+            if (res.success) {
+                toast.success(res.message || 'Student added successfully');
+                router.refresh();
+                form.resetFields();
+                setIsOpen(false);
+            } else {
+                toast.error(res.message || 'Failed to add student');
+            }
+        } catch (error: any) {
+            toast.error(error.message || 'An error occurred during submission');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <Modal
             centered
@@ -12,7 +55,7 @@ const StudentInfoModal = ({ isOpen, setIsOpen }: modalType) => {
             className="custom-black-modal"
         >
             <h3 className="mb-5 text-white text-lg font-medium">Add Student Info</h3>
-            <Form layout="vertical" onFinish={() => setIsOpen(false)}>
+            <Form form={form} layout="vertical" onFinish={onFinish}>
                 <div className="grid grid-cols-2 gap-x-4">
                     <Form.Item
                         label={<label className="block text-sm text-[#9CA3AF]">First Name</label>}
@@ -131,8 +174,12 @@ const StudentInfoModal = ({ isOpen, setIsOpen }: modalType) => {
                 </div>
 
                 <Form.Item className="mt-6 flex justify-end">
-                    <button type="submit" className="bg-[#1A5FA4] h-[45px] px-8 rounded-md text-white">
-                        Save Changes
+                    <button 
+                        type="submit" 
+                        disabled={loading}
+                        className="bg-[#1A5FA4] h-[45px] px-8 rounded-md text-white disabled:opacity-50"
+                    >
+                        {loading ? 'Adding...' : 'Save Changes'}
                     </button>
                 </Form.Item>
             </Form>
@@ -140,4 +187,4 @@ const StudentInfoModal = ({ isOpen, setIsOpen }: modalType) => {
     );
 };
 
-export default StudentInfoModal;
+export default StudentInfoModal;

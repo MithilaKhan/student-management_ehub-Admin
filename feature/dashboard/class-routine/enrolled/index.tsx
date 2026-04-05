@@ -2,10 +2,18 @@
 import HeaderTitle from '@/shared/HeaderTitle';
 import React from 'react';
 import { Form, Select } from 'antd';
-import { studentOptions } from '@/constants/dashboard/class-routine-data';
 import { MdArrowDropDown } from 'react-icons/md';
 
-const StudentEnrolled = () => {
+interface StudentEnrolledProps {
+    data: any[];
+}
+
+const StudentEnrolled = ({ data }: StudentEnrolledProps) => {
+
+    const studentOptions = data?.map((student: any) => ({
+        label: student.name,
+        value: student._id,
+    }));
 
     return (
         <div className=' w-full h-full'>

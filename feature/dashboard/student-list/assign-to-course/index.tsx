@@ -4,7 +4,16 @@ import React, { useState } from 'react';
 import AssignToCourseForm from './AssignToCourseForm';
 import ClassRoutineModal from '@/ui/modal/ClassRoutineModal';
 
-const AssignToCourse = () => { 
+interface AssignToCourseProps {
+    initialData: {
+        students: any[];
+        subjects: any[];
+        batches: any[];
+        sections: any[];
+    };
+}
+
+const AssignToCourse = ({ initialData }: AssignToCourseProps) => { 
     const [isOpen, setIsOpen] = useState(false);
 
     return (
@@ -18,7 +27,7 @@ const AssignToCourse = () => {
 
             <div className=" h-[70vh] ">
                 <div className='flex-center w-full h-full '>
-                    <AssignToCourseForm />
+                    <AssignToCourseForm initialData={initialData} />
                 </div>
             </div> 
             <ClassRoutineModal isOpen={isOpen} setIsOpen={setIsOpen} />
