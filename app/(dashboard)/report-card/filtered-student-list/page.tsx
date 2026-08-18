@@ -5,7 +5,7 @@ const filteredStudentListPage = () => {
     return (
         <div> 
             <React.Suspense> 
-            <FilteredStudentList />
+            <FilteredStudentList reportCards={[]} />
             </React.Suspense>
         </div>
     );
