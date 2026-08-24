@@ -1,32 +1,60 @@
 "use client";
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Form, Select, DatePicker } from 'antd';
 import { MdArrowDropDown } from 'react-icons/md';
 import { useRouter } from 'next/navigation';
-import { studentOptions } from '@/constants/dashboard/class-routine-data';
-import { batchOptions, gradeOptions, sectionOptions, subjectOptions } from '@/constants/dashboard/attendance-data';
+import { fetchUrl } from '@/lib/fetchUrl';
+import { Level } from '@/type';
 
 const TakeAttendanceForm = () => {
     const [form] = Form.useForm();
     const router = useRouter();
+
+    const [subjects, setSubjects] = useState<any[]>([]);
+    const [batches, setBatches] = useState<any[]>([]);
+    const [sections, setSections] = useState<any[]>([]);
+
+    const grade = Form.useWatch('grade', form);
+    const subject = Form.useWatch('subject', form);
+    const batch = Form.useWatch('batch', form);
+    const section = Form.useWatch('section', form);
+
+    useEffect(() => {
+        const loadInitialOptions = async () => {
+            try {
+                const [subRes, batRes, secRes] = await Promise.all([
+                    fetchUrl('/subject'),
+                    fetchUrl('/batch'),
+                    fetchUrl('/section')
+                ]);
+                if (subRes?.success) setSubjects(subRes?.data);
+                if (batRes?.success) setBatches(batRes?.data);
+                if (secRes?.success) setSections(secRes?.data);
+            } catch (err) {
+                console.error("Initial options fetch error:", err);
+            }
+        };
+        loadInitialOptions();
+    }, []);
+
 
     const handleReset = () => {
         form.resetFields();
     };
 
     const onFinish = (values: any) => {
-        const grade = values.grade || '';
-        const subject = values.subject || '';
-        const batch = values.batch || '';
-        const section = values.section || '';
-        const date = values.reportDate ? values.reportDate.format('YYYY-MM-DD') : '';
+        const gradeVal = values.grade || '';
+        const subjectVal = values.subject || '';
+        const batchVal = values.batch || '';
+        const sectionVal = values.section || '';
+        const dateVal = values.reportDate ? values.reportDate.format('YYYY-MM-DD') : '';
 
         const query = new URLSearchParams({
-            grade,
-            subject,
-            batch,
-            section,
-            date,
+            grade: gradeVal,
+            subject: subjectVal,
+            batch: batchVal,
+            section: sectionVal,
+            date: dateVal
         }).toString();
 
         router.push(`/attendance/take-attendance/filter-take-attendance?${query}`);
@@ -40,12 +68,13 @@ const TakeAttendanceForm = () => {
                     name="grade"
                 >
                     <Select
-                        options={gradeOptions}
+                        options={Object.values(Level).map(level => ({ label: level, value: level }))}
                         placeholder="Select Grade"
                         showSearch
                         optionFilterProp="label"
                         style={{ width: '100%', height: 45 }}
                         suffixIcon={<p> <MdArrowDropDown color='white' size={22} /> </p>}
+                        allowClear
                     />
                 </Form.Item>
 
@@ -54,12 +83,13 @@ const TakeAttendanceForm = () => {
                     name="subject"
                 >
                     <Select
-                        options={subjectOptions}
+                        options={(Array.isArray(subjects) ? subjects : []).map(item => ({ label: item.name, value: item._id }))}
                         placeholder="Select Subject"
                         showSearch
                         optionFilterProp="label"
                         style={{ width: '100%', height: 45 }}
                         suffixIcon={<p> <MdArrowDropDown color='white' size={22} /> </p>}
+                        allowClear
                     />
                 </Form.Item>
 
@@ -68,12 +98,13 @@ const TakeAttendanceForm = () => {
                     name="batch"
                 >
                     <Select
-                        options={batchOptions}
+                        options={(Array.isArray(batches) ? batches : []).map(item => ({ label: item.name, value: item._id }))}
                         placeholder="Select Batch"
                         showSearch
                         optionFilterProp="label"
                         style={{ width: '100%', height: 45 }}
                         suffixIcon={<p> <MdArrowDropDown color='white' size={22} /> </p>}
+                        allowClear
                     />
                 </Form.Item>
 
@@ -82,12 +113,13 @@ const TakeAttendanceForm = () => {
                     name="section"
                 >
                     <Select
-                        options={sectionOptions}
+                        options={(Array.isArray(sections) ? sections : []).map(item => ({ label: item.name, value: item._id }))}
                         placeholder="Select Section"
                         showSearch
                         optionFilterProp="label"
                         style={{ width: '100%', height: 45 }}
                         suffixIcon={<p> <MdArrowDropDown color='white' size={22} /> </p>}
+                        allowClear
                     />
                 </Form.Item>
 
@@ -104,20 +136,7 @@ const TakeAttendanceForm = () => {
                     />
                 </Form.Item>
 
-                <Form.Item
-                    label={<label className="block text-sm text-[#9CA3AF]">Student Name</label>}
-                    name="studentName"
-                    rules={[{ required: true, message: "Please enter Student Name" }]}
-                >
-                    <Select
-                        options={studentOptions}
-                        placeholder="Select Student Name"
-                        showSearch
-                        optionFilterProp="label"
-                        style={{ width: '100%', height: 45 }}
-                        suffixIcon={<p> <MdArrowDropDown color='white' size={22} /> </p>}
-                    />
-                </Form.Item>
+
             </div>
 
             <div className="flex justify-end gap-4 mt-4">

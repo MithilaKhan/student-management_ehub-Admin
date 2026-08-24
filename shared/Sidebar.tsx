@@ -24,22 +24,62 @@ const Sidebar = ({ onCloseDrawer }: SidebarProps) => {
 
   useEffect(() => {
     if (!mounted) return;
-    setSelectedKey(path);
+    
+    let bestMatchKey = path;
+    const allKeys: string[] = [];
+    
+    // Collect all keys
+    items.forEach((item: any) => {
+      if (item.key) allKeys.push(item.key);
+      if (item.children) {
+        item.children.forEach((child: any) => {
+          if (child.key) allKeys.push(child.key);
+        });
+      }
+    });
+
+    // If exact match not found, find the longest prefix match
+    if (!allKeys.includes(path)) {
+      let longestMatch = '';
+      for (const key of allKeys) {
+         if (key.startsWith('/') && path.startsWith(key) && key.length > longestMatch.length) {
+             longestMatch = key;
+         }
+      }
+      if (longestMatch) {
+        bestMatchKey = longestMatch;
+      }
+    }
+    
+    setSelectedKey(bestMatchKey);
+    
+    // Find parent to expand
     const parent = items.find(
-      (it) =>
-        Array.isArray((it as any).children) &&
-        (it as any).children.some((c: any) => c.key === path)
+      (it: any) =>
+        Array.isArray(it.children) &&
+        it.children.some((c: any) => c.key === bestMatchKey)
     );
+    
     if (parent) {
-      setOpenKeys([parent.key as string]);
+      setOpenKeys([(parent as any).key]);
     } else {
       const selfParent = items.find(
-        (it: any) => it.key === path && Array.isArray((it as any).children)
+        (it: any) => it.key === bestMatchKey && Array.isArray(it.children)
       );
       if (selfParent) {
-        setOpenKeys([selfParent.key as string]);
+        setOpenKeys([(selfParent as any).key]);
       } else {
-        setOpenKeys([]);
+        // Fallback: check if path contains any parent key string
+        const stringParent = items.find((it: any) => 
+          typeof it.key === 'string' && 
+          !it.key.startsWith('/') && 
+          path.includes(it.key)
+        );
+        if (stringParent) {
+          setOpenKeys([(stringParent as any).key]);
+        } else {
+          setOpenKeys([]);
+        }
       }
     }
   }, [path, items, mounted]);
