@@ -8,6 +8,7 @@ const AddTeacherTable = ({ setIsOpen }: modalType) => {
     const [blockedUsers, setBlockedUsers] = useState<number[]>([]);
 
     const dataSource = Array.from({ length: 10 }).map((_, i) => ({
+        key: i + 1,
         id: i + 1,
         fullName: "Adiyat Rahman",
         email: "1adiat20anjumj@gmail.com",
@@ -74,6 +75,7 @@ const AddTeacherTable = ({ setIsOpen }: modalType) => {
             <TableMain
                 columns={columns}
                 dataSource={dataSource}
+                rowKey="id"
                 pagination={{ pageSize: 9 }}
                 className="w-full custom-table"
             />

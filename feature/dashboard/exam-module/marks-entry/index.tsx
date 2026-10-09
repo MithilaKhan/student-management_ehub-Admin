@@ -22,24 +22,24 @@ const MarksEntry = ({ data, filters }: MarksEntryProps) => {
         router.push('/exam-module/marks-entry');
     };
 
-    // If data is present, we show the first matching record directly
+    const isFiltered = Boolean(filters?.batchId && filters?.subjectId && filters?.level);
     const selectedRecord = data && data.length > 0 ? data[0] : null;
 
     return (
         <div className='w-full min-h-screen'>
             <div className="flex justify-between items-center mb-6">
                 <HeaderTitle title="Marks Entry" />
-                {selectedRecord && (
+                {isFiltered && (
                     <button 
                         onClick={handleBack}
-                        className="bg-[#3E1B1F] text-red-500 px-6 rounded-md hover:bg-red-500/10"
+                        className="bg-[#3E1B1F] text-red-500 px-6 py-2 rounded-md hover:bg-red-500/10 cursor-pointer transition-colors"
                     >
                         Back to Filters
                     </button>
                 )}
             </div>
 
-            {!selectedRecord ? (
+            {!isFiltered ? (
                 <div className="min-h-[70vh]">
                     <div className='flex-center w-full h-full'>
                         <MarksEntryForm />
@@ -47,7 +47,7 @@ const MarksEntry = ({ data, filters }: MarksEntryProps) => {
                 </div> 
             ) : (
                 <div className="mt-4">
-                    <MarksEntryDetailed data={selectedRecord} filters={filters} />
+                    <MarksEntryDetailed data={selectedRecord || { students: [] }} filters={filters} />
                 </div>
             )}
         </div>

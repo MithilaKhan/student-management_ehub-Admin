@@ -39,6 +39,7 @@ const MarksEntryForm = () => {
         if (values.level) params.append('level', values.level);
         
         router.push(`/exam-module/marks-entry?${params.toString()}`);
+        router.refresh();
     };
 
     return (

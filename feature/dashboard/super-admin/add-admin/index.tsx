@@ -5,7 +5,13 @@ import HeaderTitle from '@/shared/HeaderTitle';
 import AdminModal from '@/ui/modal/AdminModal';
 
 const AddAdmin = () => {
-    const [open, setOpen] = useState(false)
+    const [open, setOpen] = useState(false);
+    const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+    const handleRefresh = () => {
+        setRefreshTrigger(prev => prev + 1);
+    };
+
     return (
         <div className='w-full h-full'> 
         {/* ddad */}
@@ -16,9 +22,9 @@ const AddAdmin = () => {
                 </button>
             </div>
             <div>
-                <AddAdminTable setIsOpen={setOpen} />
+                <AddAdminTable setIsOpen={setOpen} refreshTrigger={refreshTrigger} onRefresh={handleRefresh} />
             </div>
-            <AdminModal isOpen={open} setIsOpen={setOpen} />
+            <AdminModal isOpen={open} setIsOpen={setOpen} onSuccess={handleRefresh} />
         </div>
     );
 };

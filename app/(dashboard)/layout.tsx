@@ -4,6 +4,7 @@ import { ConfigProvider } from 'antd';
 import HeaderDrawerWrapper from '@/ui/HeaderDrawerWrapper';
 import { fetchServer } from '@/lib/fetchServer';
 import { UserProvider } from '@/app/providers/UserProvider';
+import { redirect } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
 
@@ -21,6 +22,13 @@ const layout = async ({ children }: { children: React.ReactNode }) => {
         // so Next.js can handle the redirection.
         if (error?.digest?.startsWith('NEXT_REDIRECT')) {
             throw error;
+        }
+        if (
+            error?.message === 'Unauthorized' ||
+            error?.message === "User doesn't exist!" ||
+            error?.message?.toLowerCase?.().includes("user doesn't exist")
+        ) {
+            redirect('/login');
         }
         console.error("Failed to fetch user profile in layout:", error);
     }

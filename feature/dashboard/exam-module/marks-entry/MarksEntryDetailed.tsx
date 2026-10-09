@@ -26,16 +26,17 @@ const MarksEntryDetailed = ({ data, filters }: MarksEntryDetailedProps) => {
         if (students.length > 0) {
             const initial: Record<string, { paper1: string }> = {};
             students.forEach((s: any) => {
-                const val = s.marksObtained !== undefined && s.marksObtained !== null ? String(s.marksObtained) : '';
-                initial[s.studentId] = {
+                const sid = String(s.studentId || s._id);
+                const val = s.marksObtained !== undefined && s.marksObtained !== null && s.marksObtained !== '' ? String(s.marksObtained) : '';
+                initial[sid] = {
                     paper1: val,
                 };
             });
             setMarks(initial);
         }
-    }, [data]);
+    }, [data, students]);
 
-    const getPaperValue = (studentId: string) => marks[studentId]?.paper1 ?? '';
+    const getPaperValue = (studentId: string) => marks[String(studentId)]?.paper1 ?? '';
 
     const getPercentage = (studentId: string, totalMarks: number) => {
         const val = getPaperValue(studentId);
@@ -48,14 +49,15 @@ const MarksEntryDetailed = ({ data, filters }: MarksEntryDetailedProps) => {
     const handleMarkChange = (studentId: string, value: string) => {
         setMarks(prev => ({
             ...prev,
-            [studentId]: { paper1: value },
+            [String(studentId)]: { paper1: value },
         }));
     };
 
     const handleReset = () => {
         const reset: Record<string, { paper1: string }> = {};
         students.forEach((s: any) => {
-            reset[s.studentId] = { paper1: '' };
+            const sid = String(s.studentId || s._id);
+            reset[sid] = { paper1: '' };
         });
         setMarks(reset);
     };
@@ -74,9 +76,10 @@ const MarksEntryDetailed = ({ data, filters }: MarksEntryDetailedProps) => {
         setLoading(true);
         try {
             const studentMarks = students.map((s: any) => {
-                const markVal = marks[s.studentId]?.paper1;
-                const marksObtained = markVal !== '' ? parseFloat(markVal || '0') : 0;
-                const totalMarks = s.totalMarks || 0;
+                const sid = String(s.studentId || s._id);
+                const markVal = marks[sid]?.paper1;
+                const marksObtained = markVal !== '' && markVal !== undefined ? parseFloat(markVal || '0') : 0;
+                const totalMarks = s.totalMarks || 100;
                 
                 // Using "parcentage" spelling as per user's Postman screenshot
                 const parcentage = totalMarks > 0 
@@ -84,10 +87,11 @@ const MarksEntryDetailed = ({ data, filters }: MarksEntryDetailedProps) => {
                     : "0";
 
                 return {
-                    studentId: s.studentId,
+                    studentId: sid,
                     marksObtained,
                     totalMarks,
-                    parcentage
+                    parcentage,
+                    grade: s.grade || filters?.level || data?.level || "O'LEVEL",
                 };
             });
 
@@ -178,45 +182,48 @@ const MarksEntryDetailed = ({ data, filters }: MarksEntryDetailedProps) => {
                             </tr>
                         </thead>
                         <tbody>
-                            {students.map((student: any, index: number) => (
-                                <tr
-                                    key={student.studentId}
-                                    className="border-b border-[#ffffff]/5 hover:bg-[#ffffff]/5 transition-colors"
-                                >
-                                    <td className="px-4 py-3 text-[#ABABAB]">{index + 1}</td>
-                                    <td className="px-4 py-3 text-white font-medium">
-                                        {student.name || '-'}
-                                    </td>
-                                    <td className="px-4 py-3">
-                                        <Input
-                                            type="number"
-                                            value={getPaperValue(student.studentId)}
-                                            onChange={(e) => handleMarkChange(student.studentId, e.target.value)}
-                                            placeholder="Enter marks"
-                                            style={{ height: 38 }}
-                                            className="rounded-md"
-                                        />
-                                    </td>
-                                    <td className="px-4 py-3">
-                                        <Input
-                                            value={student.totalMarks || student.examId?.totalMarks || ''}
-                                            disabled
-                                            placeholder="-"
-                                            style={{ height: 38 }}
-                                            className="rounded-md"
-                                        />
-                                    </td>
-                                    <td className="px-4 py-3">
-                                        <Input
-                                            value={getPercentage(student.studentId, student.totalMarks)}
-                                            disabled
-                                            placeholder="-"
-                                            style={{ height: 38 }}
-                                            className="rounded-md"
-                                        />
-                                    </td>
-                                </tr>
-                            ))}
+                            {students.map((student: any, index: number) => {
+                                const sid = String(student.studentId || student._id);
+                                return (
+                                    <tr
+                                        key={sid || index}
+                                        className="border-b border-[#ffffff]/5 hover:bg-[#ffffff]/5 transition-colors"
+                                    >
+                                        <td className="px-4 py-3 text-[#ABABAB]">{index + 1}</td>
+                                        <td className="px-4 py-3 text-white font-medium">
+                                            {student.name || '-'}
+                                        </td>
+                                        <td className="px-4 py-3">
+                                            <Input
+                                                type="number"
+                                                value={getPaperValue(sid)}
+                                                onChange={(e) => handleMarkChange(sid, e.target.value)}
+                                                placeholder="Enter marks"
+                                                style={{ height: 38 }}
+                                                className="rounded-md"
+                                            />
+                                        </td>
+                                        <td className="px-4 py-3">
+                                            <Input
+                                                value={student.totalMarks || student.examId?.totalMarks || 100}
+                                                disabled
+                                                placeholder="-"
+                                                style={{ height: 38 }}
+                                                className="rounded-md"
+                                            />
+                                        </td>
+                                        <td className="px-4 py-3">
+                                            <Input
+                                                value={getPercentage(sid, student.totalMarks || 100)}
+                                                disabled
+                                                placeholder="-"
+                                                style={{ height: 38 }}
+                                                className="rounded-md"
+                                            />
+                                        </td>
+                                    </tr>
+                                );
+                            })}
                         </tbody>
                     </table>
                 </div>

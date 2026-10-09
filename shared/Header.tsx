@@ -1,17 +1,45 @@
 "use client"
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { FaRegBell } from 'react-icons/fa6';
 import { Badge } from 'antd';
 import Link from 'next/link';
 import { useUser } from '@/app/providers/UserProvider';
+import { fetchUrl } from '@/lib/fetchUrl';
 
 const Header = () => {
     const user = useUser();
+    const [unreadCount, setUnreadCount] = useState<number>(0);
+
+    const fetchNotifications = async () => {
+        try {
+            const res = await fetchUrl('/notification/admin');
+            if (res?.success) {
+                const list = res?.data?.result || (Array.isArray(res?.data) ? res.data : []);
+                const unread = list.filter((item: any) => !item.read).length;
+                setUnreadCount(unread);
+            }
+        } catch (error) {
+            console.error('Failed to fetch unread notifications count:', error);
+        }
+    };
+
+    useEffect(() => {
+        fetchNotifications();
+
+        const handleNotificationUpdate = () => {
+            fetchNotifications();
+        };
+
+        window.addEventListener('notification-updated', handleNotificationUpdate);
+        return () => {
+            window.removeEventListener('notification-updated', handleNotificationUpdate);
+        };
+    }, []);
 
     return (
         <div className='flex items-center gap-x-7 justify-end'>
             <Link href="/notification" className='h-fit pt-2'>
-                <Badge count={1} >
+                <Badge count={unreadCount} overflowCount={99}>
                     <FaRegBell color="#7a777a" size={24} />
                 </Badge>
             </Link>

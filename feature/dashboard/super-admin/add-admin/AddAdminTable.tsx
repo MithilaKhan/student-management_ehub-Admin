@@ -1,68 +1,99 @@
 
-import React, { useState } from 'react';
+"use client";
+import React, { useState, useEffect } from 'react';
 import { modalType } from '@/type';
 import TableMain from '@/shared/TableMain';
-import { FaBan, FaCheck } from 'react-icons/fa6';
-import { AiOutlineEdit } from 'react-icons/ai';
-const AddAdminTable = ({ setIsOpen }: modalType) => {
-    const [blockedUsers, setBlockedUsers] = useState<number[]>([]);
+import { AiOutlineDelete } from 'react-icons/ai';
+import { fetchUrl } from '@/lib/fetchUrl';
+import { Modal } from 'antd';
+import toast from 'react-hot-toast';
 
-    const dataSource = Array.from({ length: 10 }).map((_, i) => ({
-        id: i + 1,
-        fullName: "Adiyat Rahman",
-        email: "1adiat20anjumj@gmail.com",
-    }));
+interface AddAdminTableProps extends modalType {
+    refreshTrigger?: number;
+    onRefresh?: () => void;
+}
 
-    const handleBlockToggle = (id: number) => {
-        setBlockedUsers((prev: any) =>
-            prev.includes(id)
-                ? prev.filter((userId: string | number) => userId !== id)
-                : [...prev, id]
-        );
+const AddAdminTable = ({ setIsOpen, refreshTrigger, onRefresh }: AddAdminTableProps) => {
+    const [admins, setAdmins] = useState<any[]>([]);
+    const [loading, setLoading] = useState(false);
+
+    const fetchAdmins = async () => {
+        try {
+            setLoading(true);
+            const res = await fetchUrl('/admin/get-admin');
+            if (res?.success) {
+                setAdmins(res.data || []);
+            }
+        } catch (error: any) {
+            console.error('Failed to fetch admins:', error);
+            toast.error(error?.message || 'Failed to fetch admin list');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchAdmins();
+    }, [refreshTrigger]);
+
+    const handleDelete = (id: string, name: string) => {
+        Modal.confirm({
+            title: `Are you sure you want to delete admin "${name}"?`,
+            content: 'This action cannot be undone.',
+            okText: 'Yes, Delete',
+            okType: 'danger',
+            cancelText: 'Cancel',
+            className: 'custom-confirm-modal',
+            async onOk() {
+                try {
+                    const res = await fetchUrl(`/admin/${id}`, {
+                        method: 'DELETE',
+                    });
+                    if (res?.success) {
+                        toast.success(res?.message || 'Admin deleted successfully');
+                        fetchAdmins();
+                        if (onRefresh) onRefresh();
+                    } else {
+                        toast.error(res?.message || 'Failed to delete admin');
+                    }
+                } catch (error: any) {
+                    toast.error(error?.message || 'Failed to delete admin');
+                }
+            },
+        });
     };
 
     const columns = [
         {
             title: 'SL',
-            dataIndex: 'id',
-            key: 'id',
+            key: 'sl',
+            width: 70,
+            render: (_: any, __: any, index: number) => index + 1,
         },
         {
             title: 'Full Name',
-            dataIndex: 'fullName',
-            key: 'fullName',
+            dataIndex: 'name',
+            key: 'name',
+            render: (text: string) => <span className="text-white font-medium">{text || 'N/A'}</span>,
         },
         {
             title: 'Email Address',
             dataIndex: 'email',
             key: 'email',
+            render: (text: string) => <span className="text-[#ABABAB]">{text || 'N/A'}</span>,
         },
         {
             title: 'Action',
             key: 'action',
+            width: 100,
             render: (_: any, record: any) => (
                 <div className="flex items-center gap-3">
-                    <button onClick={() => setIsOpen(true)} className="text-[#FBBF24]">
-                        <AiOutlineEdit size={16} />
-                    </button>
                     <button
-                        onClick={() => handleBlockToggle(record.id)}
-                        className={`text-sm px-2 py-1 rounded flex items-center gap-1 ${blockedUsers.includes(record.id)
-                            ? 'text-red-500 hover:text-red-400'
-                            : ' text-green-500 hover:text-green-400'
-                            }`}
+                        onClick={() => handleDelete(record._id, record.name)}
+                        className="text-red-500 hover:text-red-400 p-1.5 rounded bg-red-500/10 cursor-pointer"
+                        title="Delete Admin"
                     >
-                        {blockedUsers.includes(record.id) ? (
-                            <>
-                                <FaBan size={14} />
-                                <span>Block</span>
-                            </>
-                        ) : (
-                            <>
-                                <FaCheck size={14} />
-                                <span>Unblock</span>
-                            </>
-                        )}
+                        <AiOutlineDelete size={18} />
                     </button>
                 </div>
             ),
@@ -73,8 +104,10 @@ const AddAdminTable = ({ setIsOpen }: modalType) => {
         <div>
             <TableMain
                 columns={columns}
-                dataSource={dataSource} 
-                pagination={{pageSize:9}}
+                dataSource={admins} 
+                rowKey="_id"
+                loading={loading}
+                pagination={{ pageSize: 10 }}
                 className="w-full custom-table"
             />
         </div>

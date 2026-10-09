@@ -26,15 +26,17 @@ export async function fetchUrl<T = any>(endpoint: string, options: FetchOptions 
     }
   }
 
-  const defaultHeaders: HeadersInit = {
-    'Content-Type': 'application/json',
-  };
+  const defaultHeaders: Record<string, string> = {};
+
+  if (!(customOptions.body instanceof FormData)) {
+    defaultHeaders['Content-Type'] = 'application/json';
+  }
 
   // For Client-Side components: Automatically attach token if available
   if (typeof window !== 'undefined') {
     const token = localStorage.getItem('accessToken');
     if (token) {
-      (defaultHeaders as Record<string, string>)['Authorization'] = `Bearer ${token}`;
+      defaultHeaders['Authorization'] = `Bearer ${token}`;
     }
   }
   // For Server Components: You should pass `{ headers: { Authorization: `Bearer ${token}` } }` from the page
@@ -48,8 +50,7 @@ export async function fetchUrl<T = any>(endpoint: string, options: FetchOptions 
       ...customOptions,
     });
 
-    if (response.status === 401) {
-      // Handle unauthorized errors: Clear all possible auth data
+    const handleUnauthorized = () => {
       if (typeof window !== 'undefined') {
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
@@ -65,12 +66,26 @@ export async function fetchUrl<T = any>(endpoint: string, options: FetchOptions 
         window.location.href = '/login';
       }
       throw new Error('Unauthorized');
+    };
+
+    if (response.status === 401) {
+      handleUnauthorized();
     }
 
     if (!response.ok) {
       // Try to parse JSON error message if provided by backend
       const errorData = await response.json().catch(() => null);
       const errorMessage = errorData?.message || errorData?.error || `API error: ${response.status} ${response.statusText}`;
+
+      // Check for user existence or auth error messages even if status wasn't strictly 401
+      if (
+        errorMessage === "User doesn't exist!" ||
+        errorMessage === "You are not authorized" ||
+        errorMessage?.toLowerCase?.().includes("user doesn't exist")
+      ) {
+        handleUnauthorized();
+      }
+
       throw new Error(errorMessage);
     }
 
@@ -82,8 +97,10 @@ export async function fetchUrl<T = any>(endpoint: string, options: FetchOptions 
     
     const data: T = await response.json();
     return data;
-  } catch (error) {
-    console.error(`[fetchUrl Error] ${options.method || 'GET'} ${url}:`, error);
+  } catch (error: any) {
+    if (error?.message !== 'Unauthorized') {
+      console.error(`[fetchUrl Error] ${options.method || 'GET'} ${url}:`, error);
+    }
     throw error;
   }
 }

@@ -26,6 +26,13 @@ const StudentFilterForm = ({ initialData }: StudentFilterFormProps) => {
             sectionName: values.section || '',
         });
 
+        if (values.month) {
+            params.append('month', values.month.format('MMMM'));
+        }
+        if (values.year) {
+            params.append('year', values.year.format('YYYY'));
+        }
+
         router.push(`/report-card?${params.toString()}`);
     }
     return (

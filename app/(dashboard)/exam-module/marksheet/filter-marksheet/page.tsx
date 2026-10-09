@@ -1,11 +1,11 @@
 import FilterMarksheet from '@/feature/dashboard/exam-module/marksheet/filter-marksheet';
-import React from 'react';
+import React, { Suspense } from 'react';
 
 const FilterMarksheetPage = () => {
     return (
-        <div>
+        <Suspense fallback={<div className="text-white p-6">Loading marksheet...</div>}>
            <FilterMarksheet />
-        </div>
+        </Suspense>
     );
 };
 

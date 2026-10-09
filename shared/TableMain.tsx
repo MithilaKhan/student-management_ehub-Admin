@@ -20,13 +20,19 @@ const theme = {
   },
 };
 
-const TableMain = <T,>({ className, pagination, ...rest }: Props<T>) => {
+const TableMain = <T extends object = any,>({ className, pagination, rowKey, ...rest }: Props<T>) => {
   const defaultPagination =
     pagination ?? (Array.isArray(rest?.dataSource) ? { pageSize: 10, total: rest?.dataSource?.length } : undefined);
+
+  const defaultRowKey =
+    rowKey ??
+    ((record: any) =>
+      record?.key ?? record?.id ?? record?._id ?? '');
 
   return (
     <ConfigProvider theme={theme}>
       <Table
+        rowKey={defaultRowKey}
         {...(rest as TableProps<T>)}
         dataSource={Array.isArray(rest?.dataSource) ? rest.dataSource : []}
         pagination={defaultPagination}

@@ -19,8 +19,13 @@ export async function fetchServer<T = any>(endpoint: string, options: FetchOptio
   try {
     return await fetchUrl<T>(endpoint, { ...options, headers });
   } catch (error: any) {
-    // Detect 401 from fetchUrl throw
-    if (error.message === 'Unauthorized') {
+    // Detect 401 or auth/user errors from fetchUrl throw
+    if (
+      error?.message === 'Unauthorized' ||
+      error?.message === "User doesn't exist!" ||
+      error?.message === 'You are not authorized' ||
+      error?.message?.toLowerCase?.().includes("user doesn't exist")
+    ) {
       redirect('/login');
     }
     throw error;
